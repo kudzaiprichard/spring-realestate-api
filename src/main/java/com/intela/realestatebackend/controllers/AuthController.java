@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -22,14 +23,15 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ){
-        return ResponseEntity.ok(authService.register(request));
+        return ResponseEntity.created(URI.create("")).body(authService.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticateRequest request
     ){
-        return ResponseEntity.ok(authService.authenticate(request));
+        return ResponseEntity.accepted()
+                .body(authService.authenticate(request));
     }
 
     @PostMapping("/refreshToken")
