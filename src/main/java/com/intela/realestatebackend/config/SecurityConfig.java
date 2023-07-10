@@ -31,19 +31,26 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**")
                         .permitAll()
 
-                        //MANAGER ENDPOINTS
+                        //ADMIN ENDPOINTS
                         .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name())
-                        .requestMatchers(GET,"/api/v1/admin/**").hasAnyAuthority(ADMIN_READ.name(), CUSTOMER_READ.name(), DEALER_READ.name())
-                        .requestMatchers(POST,"/api/v1/admin/**").hasAnyAuthority(ADMIN_CREATE.name(), CUSTOMER_CREATE.name(), DEALER_READ.name())
-                        .requestMatchers(PUT,"/api/v1/admin/**").hasAnyAuthority(ADMIN_UPDATE.name(), CUSTOMER_UPDATE.name(), DEALER_READ.name())
-                        .requestMatchers(DELETE,"/api/v1/admin/**").hasAnyAuthority(ADMIN_DELETE.name(), CUSTOMER_DELETE.name(), DEALER_READ.name())
+                        .requestMatchers(GET,"/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
+                        .requestMatchers(POST,"/api/v1/admin/**").hasAuthority(ADMIN_CREATE.name())
+                        .requestMatchers(PUT,"/api/v1/admin/**").hasAuthority(ADMIN_UPDATE.name())
+                        .requestMatchers(DELETE,"/api/v1/admin/**").hasAuthority(ADMIN_DELETE.name())
 
-//                        //ADMIN ENDPOINTS
-//                        .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name()) //, DEALER.name(), CUSTOMER.name()
-//                        .requestMatchers(GET,"/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
-//                        .requestMatchers(POST,"/api/v1/admin/**").hasAuthority(ADMIN_CREATE.name())
-//                        .requestMatchers(PUT,"/api/v1/admin/**").hasAuthority(ADMIN_UPDATE.name())
-//                        .requestMatchers(DELETE,"/api/v1/admin/**").hasAuthority(ADMIN_DELETE.name())
+                        //CUSTOMER ENDPOINTS
+                        .requestMatchers("/api/v1/customer/**").hasAnyRole(CUSTOMER.name(),ADMIN.name())
+                        .requestMatchers(GET,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_READ.name(), ADMIN_READ.name())
+                        .requestMatchers(POST,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_CREATE.name(), ADMIN_CREATE.name())
+                        .requestMatchers(PUT,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_UPDATE.name(), ADMIN_UPDATE.name())
+                        .requestMatchers(DELETE,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_DELETE.name(), ADMIN_DELETE.name())
+
+                        //DEALER ENDPOINTS
+                        .requestMatchers("/api/v1/dealer/**").hasAnyRole(DEALER.name(),ADMIN.name())
+                        .requestMatchers(GET,"/api/v1/dealer/**").hasAnyAuthority(DEALER_READ.name(), ADMIN_READ.name())
+                        .requestMatchers(POST,"/api/v1/dealer/**").hasAnyAuthority(DEALER_CREATE.name(), ADMIN_CREATE.name())
+                        .requestMatchers(PUT,"/api/v1/dealer/**").hasAnyAuthority(DEALER_UPDATE.name(), ADMIN_UPDATE.name())
+                        .requestMatchers(DELETE,"/api/v1/dealer/**").hasAnyAuthority(DEALER_DELETE.name(), ADMIN_DELETE.name())
 
                         .anyRequest()
                         .authenticated()
