@@ -30,7 +30,9 @@ public class RealestateBackendApplication {
                     .password("1234")
                     .role(ADMIN)
                     .build();
-            System.out.println("Admin token: " + authenticationService.register(admin).getToken());
+            var savedAdmin = authenticationService.register(admin);
+            System.out.println("Admin token: " + savedAdmin.getAccessToken());
+            System.out.println("Admin refresh token: " + savedAdmin.getRefreshToken());
 
             var customer = RegisterRequest.builder()
                     .firstName("nigel")
@@ -40,7 +42,9 @@ public class RealestateBackendApplication {
                     .password("1234")
                     .role(CUSTOMER)
                     .build();
-            System.out.println("Customer token: " + authenticationService.register(customer).getToken());
+            var savedCustomer = authenticationService.register(customer);
+            System.out.println("Customer token: " + savedCustomer.getAccessToken());
+            System.out.println("Customer refresh token: " + savedCustomer.getRefreshToken());
         };
     }
 }

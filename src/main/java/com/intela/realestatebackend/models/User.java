@@ -29,6 +29,9 @@ public class User implements UserDetails{
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
     @OneToMany(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
@@ -43,7 +46,7 @@ public class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return null;
+        return this.email;
     }
 
     @Override

@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/customer")
 @RequiredArgsConstructor
 public class CustomerController {
+//    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     @GetMapping("/test")
     public ResponseEntity<String> test(){
-        return ResponseEntity.ok("CUSTOMER::TEST");
+        return ResponseEntity.ok("CUSTOMER::TEST");// + auth.getName()
     }
 }
