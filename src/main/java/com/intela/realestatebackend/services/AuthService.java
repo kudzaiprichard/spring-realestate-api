@@ -9,6 +9,7 @@ import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.AuthenticateRequest;
 import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
 import com.intela.realestatebackend.requestResponse.RegisterRequest;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,12 +51,12 @@ public class AuthService {
         });
 
         tokenRepository.saveAll(validUserTokens);
-
-
     }
 
     public AuthenticationResponse register(RegisterRequest request) {
-        System.out.println(request.getRole());
+        var userEmail = userRepository.findByEmail(request.getEmail());
+        if(userEmail.isPresent()){throw new RuntimeException("User email already exists");}
+
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -64,11 +65,17 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
+
         var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(savedUser);
         var refreshToken = jwtService.generateRefreshToken(savedUser);
         saveUserToken(savedUser, jwtToken, TokenType.ACCESS);
         saveUserToken(savedUser, refreshToken, TokenType.REFRESH);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                savedUser.getEmail(), savedUser.getPassword()
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -77,10 +84,10 @@ public class AuthService {
     }
 
 
-    public AuthenticationResponse authenticate(AuthenticateRequest request) {
+    public AuthenticationResponse authenticate(AuthenticateRequest request){
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow(()-> new EntityNotFoundException("User email does not exist"));
 
         if(passwordEncoder.matches(request.getPassword(), user.getPassword())){
 
@@ -101,8 +108,7 @@ public class AuthService {
                     .refreshToken(refreshToken)
                     .build();
         }
-
-        return null;
+        throw new RuntimeException("Incorrect password");
     }
 
     public void refreshToken(
@@ -122,10 +128,10 @@ public class AuthService {
 
         if(userEmail != null){
             var user = this.userRepository.findByEmail(userEmail)
-                    .orElseThrow();
+                    .orElseThrow(() -> new RuntimeException("Please enter valid token"));
 
             var isTokenValid = tokenRepository.findByToken(refreshToken)
-                    .map(token -> !token.getRevoked() && !token.getExpired())
+                    .map(token -> !token.getRevoked() && !token.getExpired() && token.getTokenType().equals(TokenType.REFRESH))
                     .orElse(false);
 
             if(jwtService.isTokenValid(refreshToken, user) && isTokenValid){
@@ -141,6 +147,8 @@ public class AuthService {
                         .build();
                 new ObjectMapper().writeValue(response.getOutputStream(),authResponse);
             }
+
+            throw new RuntimeException("Please enter valid refresh token");
         }
     }
 }
