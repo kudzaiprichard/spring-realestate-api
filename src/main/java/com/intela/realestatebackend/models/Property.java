@@ -19,7 +19,6 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String propertyOwnerName;
-    private String propertyOwnerLogo;
     private String location;
     private String description;
     private Integer numberOfRooms;
@@ -39,7 +38,7 @@ public class Property {
     @ToString.Exclude
     private List<Image> images = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id")
     private User user;
 }

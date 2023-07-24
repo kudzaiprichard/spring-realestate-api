@@ -1,17 +1,114 @@
 package com.intela.realestatebackend.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intela.realestatebackend.requestResponse.ImageResponse;
+import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
+import com.intela.realestatebackend.requestResponse.PropertyRequest;
+import com.intela.realestatebackend.requestResponse.PropertyResponse;
+import com.intela.realestatebackend.services.DealerService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/dealer")
 @RequiredArgsConstructor
 public class DealerController {
-    @GetMapping("/test")
-    public ResponseEntity<String> test(){
-        return ResponseEntity.ok("DEALER::TEST");
+    private final DealerService dealerService;
+    private final ObjectMapper objectMapper;
+    @PostMapping("/property/add")
+    public ResponseEntity<String> addProperty(
+            @RequestParam("images") MultipartFile[] images,
+            @RequestParam(value="propertyJsonData")String propertyJsonData,
+            HttpServletRequest servletRequest
+    ){
+        PropertyRequest propertyRequest;
+        try{
+            propertyRequest = objectMapper.readValue(propertyJsonData, PropertyRequest.class);
+
+        }catch (Exception e){
+            throw new RuntimeException("Failed to phase json to object");
+        }
+
+        try {
+            return ResponseEntity.created(URI.create("")).body(
+                    dealerService.addProperty(
+                            propertyRequest,
+                            servletRequest,
+                            images
+                    )
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping()
+    public ResponseEntity<LoggedUserResponse> getLoggedInUser(HttpServletRequest request){
+        return ResponseEntity.ok(this.dealerService.fetchLoggedInUserByToken(request));
+    }
+
+    @GetMapping("/properties")
+    public ResponseEntity<List<PropertyResponse>> fetchAllPropertiesByUserId(HttpServletRequest request){
+        return ResponseEntity.ok(this.dealerService.fetchAllPropertiesByUserId(request));
+    }
+
+    //Todo: Endpoint should return images as a list
+    @GetMapping("/property/images/{propertyId}")
+    public ResponseEntity<byte[]> fetchAllImagesByPropertyId(@PathVariable int propertyId){
+        List<ImageResponse> images = this.dealerService.fetchAllImagesByPropertyId(propertyId);
+        List<byte[]> imagesByte = new ArrayList<>();
+
+        images.forEach(image -> imagesByte.add(
+                image.getImage()
+        ));
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.valueOf("image/jpg"))
+                .body(imagesByte.get(0));
+    }
+
+    @GetMapping("/property/{propertyId}")
+    public ResponseEntity<PropertyResponse> fetchPropertyById(@PathVariable Integer propertyId){
+        return ResponseEntity.ok(this.dealerService.fetchPropertyById(propertyId));
+    }
+
+    @DeleteMapping("/property/{propertyId}")
+    public ResponseEntity<String> deletePropertyByID(@PathVariable Integer propertyId){
+        return ResponseEntity.ok(this.dealerService.deletePropertyByID(propertyId));
+    }
+
+    @PutMapping("/property/{propertyId}")
+    public ResponseEntity<String> updatePropertyById(
+            @PathVariable Integer propertyId,
+            @RequestParam("images") MultipartFile[] images,
+            @RequestParam(value="propertyJsonData")String propertyJsonData
+    ){
+        PropertyRequest propertyRequest;
+        try{
+            propertyRequest = objectMapper.readValue(propertyJsonData, PropertyRequest.class);
+
+        }catch (Exception e){
+            throw new RuntimeException("Failed to phase json to object");
+        }
+        return ResponseEntity.ok(this.dealerService.updatePropertyById(propertyRequest ,images, propertyId));
+    }
+
+    @PostMapping("/property/{propertyId}")
+    public ResponseEntity<String> addImageToProperty(@RequestParam MultipartFile[] images,@PathVariable Integer propertyId){
+        return ResponseEntity.ok(this.dealerService.addImagesToProperty(images, propertyId));
+    }
+
+    @DeleteMapping("property/image/{imageId}")
+    public ResponseEntity<String> deleteImageById(@PathVariable Integer imageId){
+        return ResponseEntity.accepted().body(this.dealerService.deleteImageById(imageId));
     }
 }
