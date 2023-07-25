@@ -2,6 +2,7 @@ package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.AuthenticateRequest;
 import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
+import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
 import com.intela.realestatebackend.requestResponse.RegisterRequest;
 import com.intela.realestatebackend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,11 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+
+    @GetMapping("/user")
+    public ResponseEntity<LoggedUserResponse> getLoggedInUser(HttpServletRequest request){
+        return ResponseEntity.ok(this.authService.fetchLoggedInUserByToken(request));
+    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(

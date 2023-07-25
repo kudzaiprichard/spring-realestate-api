@@ -21,5 +21,6 @@ public class PropertyResponse {
     private String status;
     private Long price;
     private FeatureResponse feature;
+    private LoggedUserResponse dealer;
     private List<String> images;
 }

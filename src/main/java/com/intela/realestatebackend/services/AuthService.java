@@ -8,6 +8,7 @@ import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.AuthenticateRequest;
 import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
+import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
 import com.intela.realestatebackend.requestResponse.RegisterRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+
+import static com.intela.realestatebackend.util.Util.getUserByToken;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +86,17 @@ public class AuthService {
                 .build();
     }
 
+    public LoggedUserResponse fetchLoggedInUserByToken(
+            HttpServletRequest request
+    ){
+        User user = getUserByToken(request, jwtService, this.userRepository);
+        return LoggedUserResponse.builder()
+                .firstname(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .mobileNumber(user.getMobileNumber())
+                .build();
+    }
 
     public AuthenticationResponse authenticate(AuthenticateRequest request){
 

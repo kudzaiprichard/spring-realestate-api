@@ -2,7 +2,6 @@ package com.intela.realestatebackend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.requestResponse.ImageResponse;
-import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
 import com.intela.realestatebackend.requestResponse.PropertyRequest;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import com.intela.realestatebackend.services.DealerService;
@@ -52,10 +51,6 @@ public class DealerController {
         }
     }
 
-    @GetMapping()
-    public ResponseEntity<LoggedUserResponse> getLoggedInUser(HttpServletRequest request){
-        return ResponseEntity.ok(this.dealerService.fetchLoggedInUserByToken(request));
-    }
 
     @GetMapping("/properties")
     public ResponseEntity<List<PropertyResponse>> fetchAllPropertiesByUserId(HttpServletRequest request){

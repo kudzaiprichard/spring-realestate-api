@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark,Integer> {
     List<Bookmark> findAllByUserId(Integer userId);
+    Bookmark findByPropertyId(Integer propertyId);
 }

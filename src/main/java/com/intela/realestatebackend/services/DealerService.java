@@ -32,17 +32,6 @@ public class DealerService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
-    public LoggedUserResponse fetchLoggedInUserByToken(
-            HttpServletRequest request
-    ){
-        User user = getUserByToken(request, jwtService, this.userRepository);
-        return LoggedUserResponse.builder()
-                .firstname(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .mobileNumber(user.getMobileNumber())
-                .build();
-    }
 
     private void multipartFileToImageList(MultipartFile[] imagesRequest, List<Image> images) {
         Arrays.asList(imagesRequest).forEach(
@@ -61,26 +50,6 @@ public class DealerService {
                 }
         );
     }
-    private static PropertyResponse getPropertyResponse(List<String> imageResponses, Property property) {
-        return PropertyResponse.builder()
-                .id(property.getId())
-                .propertyOwnerName(property.getPropertyOwnerName())
-                .description(property.getDescription())
-                .location(property.getLocation())
-                .numberOfRooms(property.getNumberOfRooms())
-                .propertyType(property.getPropertyType())
-                .price(property.getPrice())
-                .status(property.getStatus())
-                .feature(FeatureResponse.builder()
-                        .bathrooms(property.getFeature().getBathrooms())
-                        .bedrooms(property.getFeature().getBedrooms())
-                        .storeys(property.getFeature().getStoreys())
-                        .lounges(property.getFeature().getLounges())
-                        .build())
-                .images(imageResponses)
-                .build();
-    }
-
 
     //Fetch all properties by user id
     public List<PropertyResponse> fetchAllPropertiesByUserId(HttpServletRequest request){
@@ -91,9 +60,8 @@ public class DealerService {
                         .forEach(property -> {
                             List<String> imageResponses = new ArrayList<>();
                             property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
-                            propertyResponses.add(getPropertyResponse(imageResponses, property));
+                            propertyResponses.add(getPropertyResponse(imageResponses, property, this.userRepository));
                         });
-        
 
         return propertyResponses;
     }
@@ -152,17 +120,9 @@ public class DealerService {
 
     //Fetch a property by property id
     public PropertyResponse fetchPropertyById(Integer propertyId){
-        List<String> imageResponses = new ArrayList<>();
-        
-        Property property = this.propertyRepository.findById(propertyId)
-                .orElseThrow(()-> new EntityNotFoundException("Property not found"));
-
-        property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
-
-        return getPropertyResponse(imageResponses, property);
+        return getPropertyById(propertyId, this.propertyRepository, this.userRepository);
     }
 
-    //Todo: Delete a property by property id
     public String deletePropertyByID(Integer propertyId){
         this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
@@ -170,7 +130,7 @@ public class DealerService {
         return "Property has been deleted successfully";
     }
 
-    //Todo: Update a property by property id
+
     public String updatePropertyById(PropertyRequest property, MultipartFile[] imagesRequest , Integer propertyId){
         Property dbProperty = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
@@ -228,6 +188,7 @@ public class DealerService {
         }
         return "Property updated successfully";
     }
+
     public String addImagesToProperty(MultipartFile[] imagesRequest, Integer propertyId){
         List<Image> images = new ArrayList<>();
         Property dbProperty = this.propertyRepository.findById(propertyId)
@@ -245,21 +206,7 @@ public class DealerService {
         return "Images added successfully";
     }
     public List<ImageResponse> fetchAllImagesByPropertyId(int propertyId) {
-        List<ImageResponse> imageResponses = new ArrayList<>();
-        List<Image> images = this.imageRepository.findAllByPropertyId(propertyId);
-
-        images.forEach(
-                image -> imageResponses.add(
-                            ImageResponse.builder()
-                                    .id(image.getId())
-                                    .type(image.getType())
-                                    .name(image.getName())
-                                    .image(decompressImage(image.getImage()))
-                                    .build()
-                )
-        );
-        
-        return imageResponses;
+        return getImageByPropertyId(propertyId, this.imageRepository);
     }
 
     public String deleteImageById(Integer imageId){
@@ -269,7 +216,4 @@ public class DealerService {
         return "Image deleted successfully";
     }
 
-    //Todo: Fetch list of images
-    
-    //Todo: Fetch image by property id
 }

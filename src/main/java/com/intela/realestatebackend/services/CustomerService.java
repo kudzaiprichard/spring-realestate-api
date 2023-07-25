@@ -4,74 +4,93 @@ import com.intela.realestatebackend.models.Bookmark;
 import com.intela.realestatebackend.models.Property;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.BookmarkRepository;
+import com.intela.realestatebackend.repositories.ImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
-import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
+import com.intela.realestatebackend.requestResponse.ImageResponse;
+import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.intela.realestatebackend.util.Util.getUserByToken;
+import static com.intela.realestatebackend.util.Util.*;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
+    private final ImageRepository imageRepository;
     private final BookmarkRepository bookmarkRepository;
     private final JwtService jwtService;
 
-    //Todo: Get logged in user via token
-    public LoggedUserResponse fetchLoggedinUserBytoken(
-            HttpServletRequest request
-    ){
-        User user = getUserByToken(request, jwtService, this.userRepository);
-        return LoggedUserResponse.builder()
-                .firstname(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .mobileNumber(user.getMobileNumber())
-                .build();
-    }
+    //Todo: Add a search/filter/sorting functionality on fetching all filters
 
-    //Todo: Fetch all properties
     //should include pagination etc
-    public List<Property> fetchAllProperties(){
-        return this.propertyRepository.findAll();
+    public List<PropertyResponse> fetchAllProperties(){
+        List<PropertyResponse> propertyResponses = new ArrayList<>();
+
+        this.propertyRepository.findAll()
+                .forEach(property -> {
+                    List<String> imageResponses = new ArrayList<>();
+                    property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
+                    propertyResponses.add(getPropertyResponse(imageResponses, property, userRepository));
+                });
+
+        return propertyResponses;
     }
 
-    //Todo: Fetch property by property id
-    public Property fetchPropertyById(Integer propertyId){
-        return this.propertyRepository.findById(propertyId)
-                .orElseThrow(()->new EntityNotFoundException("Property not found"));
+    public PropertyResponse fetchPropertyById(Integer propertyId){
+        return getPropertyById(propertyId, this.propertyRepository, this.userRepository);
     }
 
-    //Todo: Fetch all bookmarks by user
-    public List<Bookmark> fetchAllBookmarkByUserId(Integer userId){
-        return this.bookmarkRepository.findAllByUserId(userId);
+    public List<ImageResponse> fetchAllImagesByPropertyId(int propertyId) {
+        return getImageByPropertyId(propertyId, this.imageRepository);
     }
 
-    //Todo: Fetch bookmark by bookmark id
-    public Bookmark fetchBookmarkById(Integer bookmarkId){
-        return this.bookmarkRepository.findById(bookmarkId)
+    public List<PropertyResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest){
+        User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
+        List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId());
+        List<PropertyResponse> bookmarkResponses = new ArrayList<>();
+
+        bookmarks.forEach(bookmark -> bookmarkResponses.add(
+                getPropertyById(
+                        bookmark.getProperty().getId(),
+                        this.propertyRepository,
+                        this.userRepository
+                    )
+                )
+        );
+
+        return bookmarkResponses;
+    }
+
+    public PropertyResponse fetchBookmarkById(Integer bookmarkId){
+         Bookmark bookmark = this.bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
+
+        return getPropertyById(bookmark.getProperty().getId(), this.propertyRepository, userRepository);
     }
 
-    //Todo: Add bookmark
-    public Bookmark addBookmark(Integer bookmarkId, HttpServletRequest servletRequest){
+    public String addBookmark(Integer propertyId, HttpServletRequest servletRequest){
+
+        if(this.bookmarkRepository.findByPropertyId(propertyId) != null){
+            throw new RuntimeException("Property already exists in your bookmarks");
+        }
+
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
-        Property property = this.propertyRepository.findById(bookmarkId)
+        Property property = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
 
         Bookmark bookmark = Bookmark.builder()
                 .user(user)
                 .property(property)
                 .build();
-       return this.bookmarkRepository.save(bookmark);
+        this.bookmarkRepository.save(bookmark);
+       return "Bookmark added successfully";
     }
-
-    //Todo: Add a search/filter/sorting functionality on fetching all filters
 }
