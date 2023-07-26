@@ -12,6 +12,7 @@ import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,10 +32,10 @@ public class CustomerService {
     //Todo: Add a search/filter/sorting functionality on fetching all filters
 
     //should include pagination etc
-    public List<PropertyResponse> fetchAllProperties(){
+    public List<PropertyResponse> fetchAllProperties(Pageable pageRequest){
         List<PropertyResponse> propertyResponses = new ArrayList<>();
 
-        this.propertyRepository.findAll()
+        this.propertyRepository.findAll(pageRequest)
                 .forEach(property -> {
                     List<String> imageResponses = new ArrayList<>();
                     property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
@@ -52,9 +53,9 @@ public class CustomerService {
         return getImageByPropertyId(propertyId, this.imageRepository);
     }
 
-    public List<PropertyResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest){
+    public List<PropertyResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest){
         User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
-        List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId());
+        List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId(), pageRequest);
         List<PropertyResponse> bookmarkResponses = new ArrayList<>();
 
         bookmarks.forEach(bookmark -> bookmarkResponses.add(

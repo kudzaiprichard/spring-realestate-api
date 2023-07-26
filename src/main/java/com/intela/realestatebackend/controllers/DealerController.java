@@ -7,6 +7,9 @@ import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import com.intela.realestatebackend.services.DealerService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/dealer")
@@ -53,8 +57,19 @@ public class DealerController {
 
 
     @GetMapping("/properties")
-    public ResponseEntity<List<PropertyResponse>> fetchAllPropertiesByUserId(HttpServletRequest request){
-        return ResponseEntity.ok(this.dealerService.fetchAllPropertiesByUserId(request));
+    public ResponseEntity<List<PropertyResponse>> fetchAllPropertiesByUserId(
+            HttpServletRequest request,
+            @RequestParam Optional<Integer> pageNumber,
+            @RequestParam Optional<String> sortBy,
+            @RequestParam Optional<Integer> amount
+    ){
+        Pageable pageRequest = PageRequest.of(
+                pageNumber.orElse(0),
+                amount.orElse(20),
+                Sort.Direction.ASC,
+                sortBy.orElse("id")
+        );
+        return ResponseEntity.ok(this.dealerService.fetchAllPropertiesByUserId(request,pageRequest));
     }
 
     //Todo: Endpoint should return images as a list

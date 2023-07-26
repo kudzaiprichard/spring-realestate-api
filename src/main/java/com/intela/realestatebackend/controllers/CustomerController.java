@@ -5,10 +5,14 @@ import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import com.intela.realestatebackend.services.CustomerService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -16,9 +20,19 @@ import java.util.List;
 public class CustomerController {
     private final CustomerService customerService;
     @GetMapping("/properties")
-    public ResponseEntity<List<PropertyResponse>> fetchAllProperties() {
+    public ResponseEntity<List<PropertyResponse>> fetchAllProperties(
+            @RequestParam Optional<Integer> pageNumber,
+            @RequestParam Optional<String> sortBy,
+            @RequestParam Optional<Integer> amount
+    ) {
 
-        return ResponseEntity.ok(this.customerService.fetchAllProperties());
+        Pageable pageRequest = PageRequest.of(
+                pageNumber.orElse(0),
+                amount.orElse(20),
+                Sort.Direction.ASC,
+                sortBy.orElse("id")
+        );
+        return ResponseEntity.ok(this.customerService.fetchAllProperties(pageRequest));
     }
 
     @GetMapping("/property/{propertyId}")
@@ -37,8 +51,20 @@ public class CustomerController {
     }
 
     @GetMapping("/bookmarks")
-    public ResponseEntity<List<PropertyResponse>> fetchAllBookmarksByUserId(HttpServletRequest servletRequest){
-        return ResponseEntity.ok(this.customerService.fetchAllBookmarksByUserId(servletRequest));
+    public ResponseEntity<List<PropertyResponse>> fetchAllBookmarksByUserId(
+            HttpServletRequest servletRequest,
+            @RequestParam Optional<Integer> pageNumber,
+            @RequestParam Optional<String> sortBy,
+            @RequestParam Optional<Integer> amount
+
+    ){
+        Pageable pageRequest = PageRequest.of(
+                pageNumber.orElse(0),
+                amount.orElse(20),
+                Sort.Direction.ASC,
+                sortBy.orElse("id")
+        );
+        return ResponseEntity.ok(this.customerService.fetchAllBookmarksByUserId(servletRequest, pageRequest));
     }
 
     @GetMapping("/bookmark/{bookmarkId}")

@@ -12,6 +12,7 @@ import com.intela.realestatebackend.requestResponse.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,11 +53,11 @@ public class DealerService {
     }
 
     //Fetch all properties by user id
-    public List<PropertyResponse> fetchAllPropertiesByUserId(HttpServletRequest request){
+    public List<PropertyResponse> fetchAllPropertiesByUserId(HttpServletRequest request, Pageable pageRequest){
         User user = getUserByToken(request, jwtService, this.userRepository);
         List<PropertyResponse> propertyResponses = new ArrayList<>();
         
-        this.propertyRepository.findAllByUserId(user.getId())
+        this.propertyRepository.findAllByUserId(user.getId(), pageRequest)
                         .forEach(property -> {
                             List<String> imageResponses = new ArrayList<>();
                             property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
