@@ -76,6 +76,8 @@ Below is a screenshot of the project restful api endpoints and the HTTP Method s
 Below is the UML design of the system including relationships between the difference objects that make up the system
 
 <img src="images/realestate-uml.png" alt="UML Diagram" height="900">
+The bottom diagram extends the one above and takes precedence in any data conflict
+<img src="images/QUADRILATERAL INVESTMENT DEV UML.png" alt="UML Diagram Extended" height="900">
 
 ### Built With
 Used Java spring boot , MySQL and Jason Web Token to build the rest api, including postman for testing.
