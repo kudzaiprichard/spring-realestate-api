@@ -1,13 +1,16 @@
 package com.intela.realestatebackend.models;
 
+import com.intela.realestatebackend.models.application.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -25,6 +28,8 @@ public class User implements UserDetails{
     @Column(unique = true)
     private String email;
     private String password;
+    private Timestamp bannedTill;
+    private Timestamp createdAt;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -39,11 +44,13 @@ public class User implements UserDetails{
     )
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<UserProfile> userProfiles;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
     }
-
+    
     @Override
     public String getUsername() {
         return this.email;
