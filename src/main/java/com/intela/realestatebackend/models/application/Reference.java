@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "references")
+@Table(name = "user_references")
 @Getter
 @Setter
 @AllArgsConstructor
