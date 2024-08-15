@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize)->authorize
                         .requestMatchers("/api/v1/auth/**")
                         .permitAll()
+                        .requestMatchers("/**").permitAll()
                         //ADMIN ENDPOINTS
                         .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name())
                         .requestMatchers(GET,"/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
