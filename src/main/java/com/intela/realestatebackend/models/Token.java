@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models;
 
+import com.intela.realestatebackend.models.archetypes.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
 

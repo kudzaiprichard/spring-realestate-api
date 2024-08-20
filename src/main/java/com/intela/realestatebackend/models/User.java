@@ -1,6 +1,8 @@
 package com.intela.realestatebackend.models;
 
-import com.intela.realestatebackend.models.application.UserProfile;
+import com.intela.realestatebackend.models.application.CustomerInformation;
+import com.intela.realestatebackend.models.archetypes.Role;
+import com.intela.realestatebackend.models.property.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,7 +47,7 @@ public class User implements UserDetails{
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<UserProfile> userProfiles;
+    private Set<CustomerInformation> customerInformations;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

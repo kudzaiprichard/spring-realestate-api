@@ -1,4 +1,4 @@
-package com.intela.realestatebackend.models;
+package com.intela.realestatebackend.models.property;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,8 +18,8 @@ public class Feature {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private int bathrooms;
-    private int bedrooms;
-    private int lounges;
-    private int storeys;
+    private Integer bathrooms;
+    private Integer bedrooms;
+    private Integer lounges;
+    private Integer parking;
 }

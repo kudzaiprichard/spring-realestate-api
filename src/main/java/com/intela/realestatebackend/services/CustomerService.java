@@ -1,12 +1,14 @@
 package com.intela.realestatebackend.services;
 
-import com.intela.realestatebackend.models.Bookmark;
-import com.intela.realestatebackend.models.Property;
+import com.intela.realestatebackend.models.property.Bookmark;
+import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.BookmarkRepository;
-import com.intela.realestatebackend.repositories.ImageRepository;
+import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.requestResponse.ApplicationRequest;
+import com.intela.realestatebackend.requestResponse.ApplicationResponse;
 import com.intela.realestatebackend.requestResponse.ImageResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,7 +27,7 @@ import static com.intela.realestatebackend.util.Util.*;
 public class CustomerService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
-    private final ImageRepository imageRepository;
+    private final PropertyImageRepository propertyImageRepository;
     private final BookmarkRepository bookmarkRepository;
     private final JwtService jwtService;
 
@@ -38,7 +40,7 @@ public class CustomerService {
         this.propertyRepository.findAll(pageRequest)
                 .forEach(property -> {
                     List<String> imageResponses = new ArrayList<>();
-                    property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
+                    property.getPropertyImages().forEach(image1 -> imageResponses.add(image1.getName()));
                     propertyResponses.add(getPropertyResponse(imageResponses, property, userRepository));
                 });
 
@@ -50,7 +52,7 @@ public class CustomerService {
     }
 
     public List<ImageResponse> fetchAllImagesByPropertyId(int propertyId) {
-        return getImageByPropertyId(propertyId, this.imageRepository);
+        return getImageByPropertyId(propertyId, this.propertyImageRepository);
     }
 
     public List<PropertyResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest){
@@ -70,11 +72,14 @@ public class CustomerService {
         return bookmarkResponses;
     }
 
-    public PropertyResponse fetchBookmarkById(Integer bookmarkId){
-         Bookmark bookmark = this.bookmarkRepository.findById(bookmarkId)
-                .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
-
-        return getPropertyById(bookmark.getProperty().getId(), this.propertyRepository, userRepository);
+    public PropertyResponse fetchBookmarkById(Integer bookmarkId, HttpServletRequest servletRequest){
+        User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
+        Bookmark bookmark = this.bookmarkRepository.findById(bookmarkId)
+            .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
+        if (bookmark.getUser().getId() == loggedUser.getId())
+            return getPropertyById(bookmark.getProperty().getId(), this.propertyRepository, userRepository);
+        else
+            return null;
     }
 
     public String addBookmark(Integer propertyId, HttpServletRequest servletRequest){
@@ -92,6 +97,26 @@ public class CustomerService {
                 .property(property)
                 .build();
         this.bookmarkRepository.save(bookmark);
-       return "Bookmark added successfully";
+        return "Bookmark added successfully";
+    }
+
+    public String removeBookmark(Integer bookmarkId, HttpServletRequest servletRequest) {
+        return null;
+    }
+
+    public ApplicationResponse createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request) {
+        return null;
+    }
+
+    public List<ApplicationResponse> getAllApplications(HttpServletRequest servletRequest) {
+        return null;
+    }
+
+    public List<ApplicationResponse> getApplication(Integer applicationId, HttpServletRequest servletRequest) {
+        return null;
+    }
+
+    public String withdrawApplication(Integer applicationId, HttpServletRequest servletRequest) {
+        return null;
     }
 }

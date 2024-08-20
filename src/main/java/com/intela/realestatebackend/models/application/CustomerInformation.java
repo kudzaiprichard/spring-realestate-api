@@ -1,9 +1,10 @@
 package com.intela.realestatebackend.models.application;
 
-import com.intela.realestatebackend.models.Property;
+import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
@@ -13,8 +14,8 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class UserProfile {
+@SuperBuilder
+public class CustomerInformation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

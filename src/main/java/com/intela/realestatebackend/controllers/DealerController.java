@@ -2,7 +2,8 @@ package com.intela.realestatebackend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.requestResponse.ImageResponse;
-import com.intela.realestatebackend.requestResponse.PropertyRequest;
+import com.intela.realestatebackend.requestResponse.PlanCreationRequest;
+import com.intela.realestatebackend.requestResponse.PropertyCreationRequest;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import com.intela.realestatebackend.services.DealerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,9 +35,9 @@ public class DealerController {
             @RequestParam(value="propertyJsonData")String propertyJsonData,
             HttpServletRequest servletRequest
     ){
-        PropertyRequest propertyRequest;
+        PropertyCreationRequest propertyCreationRequest;
         try{
-            propertyRequest = objectMapper.readValue(propertyJsonData, PropertyRequest.class);
+            propertyCreationRequest = objectMapper.readValue(propertyJsonData, PropertyCreationRequest.class);
 
         }catch (Exception e){
             throw new RuntimeException("Failed to phase json to object");
@@ -45,7 +46,7 @@ public class DealerController {
         try {
             return ResponseEntity.created(URI.create("")).body(
                     dealerService.addProperty(
-                            propertyRequest,
+                            propertyCreationRequest,
                             servletRequest,
                             images
                     )
@@ -102,23 +103,46 @@ public class DealerController {
             @RequestParam("images") MultipartFile[] images,
             @RequestParam(value="propertyJsonData")String propertyJsonData
     ){
-        PropertyRequest propertyRequest;
+        PropertyCreationRequest propertyCreationRequest;
         try{
-            propertyRequest = objectMapper.readValue(propertyJsonData, PropertyRequest.class);
+            propertyCreationRequest = objectMapper.readValue(propertyJsonData, PropertyCreationRequest.class);
 
         }catch (Exception e){
             throw new RuntimeException("Failed to phase json to object");
         }
-        return ResponseEntity.ok(this.dealerService.updatePropertyById(propertyRequest ,images, propertyId));
+        return ResponseEntity.ok(this.dealerService.updatePropertyById(propertyCreationRequest,images, propertyId));
     }
 
     @PostMapping("/property/{propertyId}")
-    public ResponseEntity<String> addImageToProperty(@RequestParam MultipartFile[] images,@PathVariable Integer propertyId){
+    public ResponseEntity<String> addImageToProperty(@RequestBody MultipartFile[] images, @PathVariable Integer propertyId){
         return ResponseEntity.ok(this.dealerService.addImagesToProperty(images, propertyId));
     }
 
     @DeleteMapping("property/image/{imageId}")
     public ResponseEntity<String> deleteImageById(@PathVariable Integer imageId){
         return ResponseEntity.accepted().body(this.dealerService.deleteImageById(imageId));
+    }
+
+    @PostMapping("/property/plan/add/{propertyId}")
+    public ResponseEntity<String> addPlanToProperty(@PathVariable Integer propertyId,
+                                                    @RequestParam("images") MultipartFile[] images,
+                                                    @RequestParam(value="propertyJsonData")String propertyJsonData,
+                                                    HttpServletRequest servletRequest) {
+        PlanCreationRequest planCreationRequest;
+        try{
+            planCreationRequest = objectMapper.readValue(propertyJsonData, PlanCreationRequest.class);
+
+        }catch (Exception e){
+            throw new RuntimeException("Failed to phase json to object");
+        }
+
+        return ResponseEntity.created(URI.create("")).body(
+                dealerService.addPlan(
+                        propertyId,
+                        planCreationRequest,
+                        servletRequest,
+                        images
+                )
+        );
     }
 }

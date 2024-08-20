@@ -4,12 +4,9 @@ import com.intela.realestatebackend.models.property.Property;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @AllArgsConstructor
-public class PropertyResponse extends Property {
-    private List<String> images;
+public class PropertyCreationRequest extends Property {
 }

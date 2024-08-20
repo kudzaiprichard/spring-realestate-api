@@ -5,13 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeatureResponse{
-    private int bathrooms;
-    private int bedrooms;
-    private int lounges;
-    private int parking;
+public class UpdateProfileResponse {
+    Map<String, Object> updatedFields;
 }

@@ -1,4 +1,4 @@
-package com.intela.realestatebackend.models;
+package com.intela.realestatebackend.models.archetypes;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

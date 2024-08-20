@@ -1,15 +1,12 @@
 package com.intela.realestatebackend.requestResponse;
 
-import com.intela.realestatebackend.models.property.Property;
+import com.intela.realestatebackend.models.property.Plan;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @AllArgsConstructor
-public class PropertyResponse extends Property {
-    private List<String> images;
+public class PlanCreationRequest extends Plan {
 }

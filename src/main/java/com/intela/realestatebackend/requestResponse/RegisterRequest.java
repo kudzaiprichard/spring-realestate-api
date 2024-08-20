@@ -1,6 +1,6 @@
 package com.intela.realestatebackend.requestResponse;
 
-import com.intela.realestatebackend.models.Role;
+import com.intela.realestatebackend.models.archetypes.Role;
 import lombok.*;
 
 @Data

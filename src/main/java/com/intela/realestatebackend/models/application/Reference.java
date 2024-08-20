@@ -27,7 +27,7 @@ public class Reference {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
-    private UserProfile profile;
+    private CustomerInformation profile;
 
     @OneToMany(mappedBy = "reference")
     private Set<ResidentialHistory> residentialHistories;

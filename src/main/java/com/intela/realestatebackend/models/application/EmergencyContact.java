@@ -24,5 +24,5 @@ public class EmergencyContact {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
-    private UserProfile profile;
+    private CustomerInformation profile;
 }

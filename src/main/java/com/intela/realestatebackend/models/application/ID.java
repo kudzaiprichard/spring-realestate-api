@@ -1,7 +1,9 @@
 package com.intela.realestatebackend.models.application;
 
+import com.intela.realestatebackend.models.Image;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "ids")
@@ -9,17 +11,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class ID {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String formOfId;
-    private String filePath;
-
+@SuperBuilder
+public class ID extends Image {
     @ManyToOne
     @JoinColumn(name = "profile_id")
-    private UserProfile profile;
+    private CustomerInformation profile;
 }

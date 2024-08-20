@@ -1,9 +1,9 @@
 package com.intela.realestatebackend.util;
 
-import com.intela.realestatebackend.models.Image;
-import com.intela.realestatebackend.models.Property;
+import com.intela.realestatebackend.models.property.PropertyImage;
+import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
-import com.intela.realestatebackend.repositories.ImageRepository;
+import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.FeatureResponse;
@@ -109,13 +109,7 @@ public class Util {
                 .propertyType(property.getPropertyType())
                 .price(property.getPrice())
                 .status(property.getStatus())
-                .feature(FeatureResponse.builder()
-                        .bathrooms(property.getFeature().getBathrooms())
-                        .bedrooms(property.getFeature().getBedrooms())
-                        .storeys(property.getFeature().getStoreys())
-                        .lounges(property.getFeature().getLounges())
-                        .build())
-                .dealer(dealer)
+                .feature(property.getFeature())
                 .images(imageResponses)
                 .build();
     }
@@ -128,22 +122,22 @@ public class Util {
                 .orElseThrow(()-> new EntityNotFoundException("Property not found"));
         List<String> imageResponses = new ArrayList<>();
 
-        property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
+        property.getPropertyImages().forEach(propertyImage1 -> imageResponses.add(propertyImage1.getName()));
 
         return getPropertyResponse(imageResponses, property, userRepository);
     }
 
-    public static List<ImageResponse> getImageByPropertyId(int propertyId, ImageRepository imageRepository) {
+    public static List<ImageResponse> getImageByPropertyId(int propertyId, PropertyImageRepository propertyImageRepository) {
         List<ImageResponse> imageResponses = new ArrayList<>();
-        List<Image> images = imageRepository.findAllByPropertyId(propertyId);
+        List<PropertyImage> propertyImages = propertyImageRepository.findAllByPropertyId(propertyId);
 
-        images.forEach(
-                image -> imageResponses.add(
+        propertyImages.forEach(
+                propertyImage -> imageResponses.add(
                         ImageResponse.builder()
-                                .id(image.getId())
-                                .type(image.getType())
-                                .name(image.getName())
-                                .image(decompressImage(image.getImage()))
+                                .id(propertyImage.getId())
+                                .type(propertyImage.getType())
+                                .name(propertyImage.getName())
+                                .image(decompressImage(propertyImage.getImage()))
                                 .build()
                 )
         );

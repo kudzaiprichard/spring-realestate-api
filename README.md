@@ -5,7 +5,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/kudzaiprichard/realestate-backend">
-    <img src="images/logo/logo.jpg" alt="Logo" width="80" height="80">
+    <img src="propertyImages/logo/logo.jpg" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Real Estate Backend</h3>
@@ -62,7 +62,7 @@ System uses REST API Architecture. REST stands for Representational State Transf
 style for designing networked applications. It allows different software systems to communicate with each other by 
 exchanging data over the internet, typically using the HTTP protocol.
 
-<img src="images/architecture.jpg" alt="architecture Diagram" >
+<img src="propertyImages/architecture.jpg" alt="architecture Diagram" >
 
 This will architecture is scalable, flexible and lightweight and allows for other third party software, mobile, web written
 in different languages to easily integrate with our services
@@ -70,23 +70,23 @@ in different languages to easily integrate with our services
 ### Endpoit Design
 Below is a screenshot of the project restful api endpoints and the HTTP Method supported by each endpoint
 
-<img src="images/realestate-endpoints-docs.png" alt="endpoints" >
+<img src="propertyImages/realestate-endpoints-docs.png" alt="endpoints" >
 
 ### UML Diagram
 Below is the UML design of the system including relationships between the difference objects that make up the system
 
-<img src="images/realestate-uml.png" alt="UML Diagram" height="900">
+<img src="propertyImages/realestate-uml.png" alt="UML Diagram" height="900">
 The bottom diagram extends the one above and takes precedence in any data conflict
-<img src="images/QUADRILATERAL INVESTMENT DEV UML.png" alt="UML Diagram Extended" height="900">
+<img src="propertyImages/QUADRILATERAL INVESTMENT DEV UML.png" alt="UML Diagram Extended" height="900">
 
 ### Built With
 Used Java spring boot , MySQL and Jason Web Token to build the rest api, including postman for testing.
 
 <div align="center">
-<img src="images/logo/java.png" alt="spring" width="100" height="80" style="margin-right: 20px;"> 
-    <img src="images/logo/spring.png" alt="spring" width="160" height="82" style="margin-right: 20px;"> 
-    <img src="images/logo/mysql.webp" alt="mysql" width="110" height="80" style="margin-right: 20px;">
-    <img src="images/logo/jwt.png" alt="jwt" width="85" height="80">
+<img src="propertyImages/logo/java.png" alt="spring" width="100" height="80" style="margin-right: 20px;"> 
+    <img src="propertyImages/logo/spring.png" alt="spring" width="160" height="82" style="margin-right: 20px;"> 
+    <img src="propertyImages/logo/mysql.webp" alt="mysql" width="110" height="80" style="margin-right: 20px;">
+    <img src="propertyImages/logo/jwt.png" alt="jwt" width="85" height="80">
 </div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

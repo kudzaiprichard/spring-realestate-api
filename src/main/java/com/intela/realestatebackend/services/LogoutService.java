@@ -1,7 +1,7 @@
 package com.intela.realestatebackend.services;
 
 import com.intela.realestatebackend.models.Token;
-import com.intela.realestatebackend.models.TokenType;
+import com.intela.realestatebackend.models.archetypes.TokenType;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.repositories.UserRepository;

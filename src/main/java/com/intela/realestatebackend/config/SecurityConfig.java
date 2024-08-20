@@ -13,8 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.intela.realestatebackend.models.Permission.*;
-import static com.intela.realestatebackend.models.Role.*;
+import static com.intela.realestatebackend.models.archetypes.Permission.*;
+import static com.intela.realestatebackend.models.archetypes.Role.*;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.http.HttpMethod.DELETE;
 

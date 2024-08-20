@@ -1,11 +1,11 @@
 package com.intela.realestatebackend.services;
 
-import com.intela.realestatebackend.models.Feature;
-import com.intela.realestatebackend.models.Image;
-import com.intela.realestatebackend.models.Property;
+import com.intela.realestatebackend.models.property.Feature;
+import com.intela.realestatebackend.models.property.PropertyImage;
+import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.FeatureRepository;
-import com.intela.realestatebackend.repositories.ImageRepository;
+import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
@@ -29,22 +29,22 @@ import static com.intela.realestatebackend.util.Util.*;
 public class DealerService {
     private final PropertyRepository propertyRepository;
     private final FeatureRepository featureRepository;
-    private final ImageRepository imageRepository;
+    private final PropertyImageRepository propertyImageRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
 
-    private void multipartFileToImageList(MultipartFile[] imagesRequest, List<Image> images) {
+    private void multipartFileToImageList(MultipartFile[] imagesRequest, List<PropertyImage> propertyImages) {
         Arrays.asList(imagesRequest).forEach(
                 imageRequest -> {
                     try {
-                        Image image = Image.builder()
+                        PropertyImage propertyImage = PropertyImage.builder()
                                 .image(compressImage(imageRequest.getBytes()))
                                 .name(imageRequest.getOriginalFilename())
                                 .type(imageRequest.getContentType())
                                 .property(null)
                                 .build();
-                        images.add(imageRepository.save(image));
+                        propertyImages.add(propertyImageRepository.save(propertyImage));
                     } catch (IOException e) {
                         throw new RuntimeException("Could not save image: " + e);
                     }
@@ -60,7 +60,7 @@ public class DealerService {
         this.propertyRepository.findAllByUserId(user.getId(), pageRequest)
                         .forEach(property -> {
                             List<String> imageResponses = new ArrayList<>();
-                            property.getImages().forEach(image1 -> imageResponses.add(image1.getName()));
+                            property.getPropertyImages().forEach(propertyImage1 -> imageResponses.add(propertyImage1.getName()));
                             propertyResponses.add(getPropertyResponse(imageResponses, property, this.userRepository));
                         });
 
@@ -68,22 +68,22 @@ public class DealerService {
     }
 
     //Add property
-    public String addProperty(PropertyRequest propertyRequest,
-                                HttpServletRequest servletRequest,
-                                MultipartFile[] imagesRequest
+    public String addProperty(PropertyCreationRequest propertyCreationRequest,
+                              HttpServletRequest servletRequest,
+                              MultipartFile[] imagesRequest
     ) throws IOException {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         // final Image savedImage;
         final Feature savedFeature;
-        List<Image> images = new ArrayList<>();
-        multipartFileToImageList(imagesRequest, images);
+        List<PropertyImage> propertyImages = new ArrayList<>();
+        multipartFileToImageList(imagesRequest, propertyImages);
 
         //Create, save property features
         Feature feature = Feature.builder()
-                .bathrooms(propertyRequest.getBathrooms())
-                .lounges(propertyRequest.getLounges())
-                .storeys(propertyRequest.getStoreys())
-                .bedrooms(propertyRequest.getBedrooms())
+                .bathrooms(propertyCreationRequest.getFeature().getBathrooms())
+                .lounges(propertyCreationRequest.getFeature().getLounges())
+                .parking(propertyCreationRequest.getFeature().getParking())
+                .bedrooms(propertyCreationRequest.getFeature().getBedrooms())
                 .build();
         try{
             savedFeature = this.featureRepository.save(feature);
@@ -93,24 +93,24 @@ public class DealerService {
 
         //Create and save property
         Property property = Property.builder()
-                .images(images) // saved images
-                .location(propertyRequest.getLocation())
-                .description(propertyRequest.getDescription())
-                .numberOfRooms(propertyRequest.getNumberOfRooms())
-                .propertyType(propertyRequest.getPropertyType())
+                .propertyImages(propertyImages) // saved images
+                .location(propertyCreationRequest.getLocation())
+                .description(propertyCreationRequest.getDescription())
+                .numberOfRooms(propertyCreationRequest.getNumberOfRooms())
+                .propertyType(propertyCreationRequest.getPropertyType())
                 .feature(savedFeature) //saved features
-                .status(propertyRequest.getStatus())
-                .price(propertyRequest.getPrice())
-                .propertyOwnerName(propertyRequest.getPropertyOwnerName())
+                .status(propertyCreationRequest.getStatus())
+                .price(propertyCreationRequest.getPrice())
+                .propertyOwnerName(propertyCreationRequest.getPropertyOwnerName())
                 .user(user)
                 .build();
 
         Property savedProperty = this.propertyRepository.save(property);
         //set images property id to saved property
         try{
-            images.forEach(image -> image.setProperty(savedProperty));
+            propertyImages.forEach(propertyImage -> propertyImage.setProperty(savedProperty));
 
-            this.imageRepository.saveAll(images);
+            this.propertyImageRepository.saveAll(propertyImages);
         }catch (Exception e){
             throw new RuntimeException("Could not save image: " + e);
         }
@@ -132,12 +132,12 @@ public class DealerService {
     }
 
 
-    public String updatePropertyById(PropertyRequest property, MultipartFile[] imagesRequest , Integer propertyId){
+    public String updatePropertyById(PropertyCreationRequest property, MultipartFile[] imagesRequest , Integer propertyId){
         Property dbProperty = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
         
         //Update Field if not blank
-        if(!property.getPropertyType().isBlank()){
+        if(!(property.getPropertyType() == null)){
             dbProperty.setPropertyType(property.getPropertyType());
         }
         if(!property.getPropertyOwnerName().isBlank()){
@@ -158,31 +158,31 @@ public class DealerService {
         if(!property.getNumberOfRooms().toString().isBlank()){
             dbProperty.setNumberOfRooms(property.getNumberOfRooms());
         }
-        if(!property.getBathrooms().toString().isBlank()){
-            dbProperty.getFeature().setBathrooms(property.getBathrooms());
+        if(!property.getFeature().getBathrooms().toString().isBlank()){
+            dbProperty.getFeature().setBathrooms(property.getFeature().getBathrooms());
         }
-        if(!property.getBedrooms().toString().isBlank()){
-            dbProperty.getFeature().setBedrooms(property.getBedrooms());
+        if(!property.getFeature().getBedrooms().toString().isBlank()){
+            dbProperty.getFeature().setBedrooms(property.getFeature().getBedrooms());
         }
-        if(!property.getLounges().toString().isBlank()){
-            dbProperty.getFeature().setLounges(property.getLounges());
+        if(!property.getFeature().getLounges().toString().isBlank()){
+            dbProperty.getFeature().setLounges(property.getFeature().getLounges());
         }
-        if(!property.getStoreys().toString().isBlank()){
-            dbProperty.getFeature().setStoreys(property.getStoreys());
+        if(!property.getFeature().getParking().toString().isBlank()){
+            dbProperty.getFeature().setParking(property.getFeature().getParking());
         }
 
         //Update images
         if(imagesRequest.length > 0){
-            List<Image> images = new ArrayList<>();
-            multipartFileToImageList(imagesRequest, images);
-            List<Image> dbImages = this.imageRepository.findAllByPropertyId(dbProperty.getId());
+            List<PropertyImage> propertyImages = new ArrayList<>();
+            multipartFileToImageList(imagesRequest, propertyImages);
+            List<PropertyImage> dbPropertyImages = this.propertyImageRepository.findAllByPropertyId(dbProperty.getId());
             Property savedProperty = this.propertyRepository.save(dbProperty);
 
             //set images property id to saved property
             try{
-                this.imageRepository.deleteAll(dbImages);
-                images.forEach(image -> image.setProperty(savedProperty));
-                this.imageRepository.saveAll(images);
+                this.propertyImageRepository.deleteAll(dbPropertyImages);
+                propertyImages.forEach(propertyImage -> propertyImage.setProperty(savedProperty));
+                this.propertyImageRepository.saveAll(propertyImages);
             }catch (Exception e){
                 throw new RuntimeException("Could not save image: " + e);
             }
@@ -191,15 +191,15 @@ public class DealerService {
     }
 
     public String addImagesToProperty(MultipartFile[] imagesRequest, Integer propertyId){
-        List<Image> images = new ArrayList<>();
+        List<PropertyImage> propertyImages = new ArrayList<>();
         Property dbProperty = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
-        multipartFileToImageList(imagesRequest, images);
+        multipartFileToImageList(imagesRequest, propertyImages);
 
         //set images property id to saved property
         try{
-            images.forEach(image -> image.setProperty(dbProperty));
-            this.imageRepository.saveAll(images);
+            propertyImages.forEach(propertyImage -> propertyImage.setProperty(dbProperty));
+            this.propertyImageRepository.saveAll(propertyImages);
         }catch (Exception e){
             throw new RuntimeException("Could not save image: " + e);
         }
@@ -207,14 +207,17 @@ public class DealerService {
         return "Images added successfully";
     }
     public List<ImageResponse> fetchAllImagesByPropertyId(int propertyId) {
-        return getImageByPropertyId(propertyId, this.imageRepository);
+        return getImageByPropertyId(propertyId, this.propertyImageRepository);
     }
 
     public String deleteImageById(Integer imageId){
-        this.imageRepository.findById(imageId)
+        this.propertyImageRepository.findById(imageId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find images"));
-        this.imageRepository.deleteById(imageId);
+        this.propertyImageRepository.deleteById(imageId);
         return "Image deleted successfully";
     }
 
+    public String addPlan(Integer propertyId, PlanCreationRequest planCreationRequest, HttpServletRequest servletRequest, MultipartFile[] images) {
+        return null;
+    }
 }
