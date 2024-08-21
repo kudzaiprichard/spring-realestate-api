@@ -19,12 +19,12 @@ import java.util.List;
 @SuperBuilder
 @Entity(name = "properties")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "parent_listing", discriminatorType = DiscriminatorType.INTEGER)
 public class Property {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String propertyOwnerName;
     private String location;
     private String description;

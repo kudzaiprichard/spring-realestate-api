@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Entity(name = "images")
+@MappedSuperclass
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Image{
 

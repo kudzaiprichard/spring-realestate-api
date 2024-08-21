@@ -31,18 +31,10 @@ public class DealerController {
     private final ObjectMapper objectMapper;
     @PostMapping("/property/add")
     public ResponseEntity<String> addProperty(
-            @RequestParam("images") MultipartFile[] images,
-            @RequestParam(value="propertyJsonData")String propertyJsonData,
+            @RequestPart("images") MultipartFile[] images,
+            @RequestPart(value="propertyJsonData") PropertyCreationRequest propertyCreationRequest,
             HttpServletRequest servletRequest
     ){
-        PropertyCreationRequest propertyCreationRequest;
-        try{
-            propertyCreationRequest = objectMapper.readValue(propertyJsonData, PropertyCreationRequest.class);
-
-        }catch (Exception e){
-            throw new RuntimeException("Failed to phase json to object");
-        }
-
         try {
             return ResponseEntity.created(URI.create("")).body(
                     dealerService.addProperty(
@@ -125,17 +117,9 @@ public class DealerController {
 
     @PostMapping("/property/plan/add/{propertyId}")
     public ResponseEntity<String> addPlanToProperty(@PathVariable Integer propertyId,
-                                                    @RequestParam("images") MultipartFile[] images,
-                                                    @RequestParam(value="propertyJsonData")String propertyJsonData,
+                                                    @RequestPart("images") MultipartFile[] images,
+                                                    @RequestPart(value="propertyJsonData")PlanCreationRequest planCreationRequest,
                                                     HttpServletRequest servletRequest) {
-        PlanCreationRequest planCreationRequest;
-        try{
-            planCreationRequest = objectMapper.readValue(propertyJsonData, PlanCreationRequest.class);
-
-        }catch (Exception e){
-            throw new RuntimeException("Failed to phase json to object");
-        }
-
         return ResponseEntity.created(URI.create("")).body(
                 dealerService.addPlan(
                         propertyId,
