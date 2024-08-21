@@ -33,7 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize)->authorize
                         .requestMatchers("/api/v1/auth/**")
                         .permitAll()
-                        .requestMatchers("/**").permitAll()
+                        // Allow access to Swagger UI and API docs
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**")
+                        .permitAll()
                         //ADMIN ENDPOINTS
                         .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name())
                         .requestMatchers(GET,"/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
