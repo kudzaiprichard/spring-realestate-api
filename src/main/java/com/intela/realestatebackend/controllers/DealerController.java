@@ -1,10 +1,7 @@
 package com.intela.realestatebackend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intela.realestatebackend.requestResponse.ImageResponse;
-import com.intela.realestatebackend.requestResponse.PlanCreationRequest;
-import com.intela.realestatebackend.requestResponse.PropertyCreationRequest;
-import com.intela.realestatebackend.requestResponse.PropertyResponse;
+import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.DealerService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +33,13 @@ public class DealerController {
             HttpServletRequest servletRequest
     ){
         try {
+            dealerService.addProperty(
+                    propertyCreationRequest,
+                    servletRequest,
+                    images
+            );
             return ResponseEntity.created(URI.create("")).body(
-                    dealerService.addProperty(
-                            propertyCreationRequest,
-                            servletRequest,
-                            images
-                    )
+                    "Property was successfully saved"
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -86,7 +84,8 @@ public class DealerController {
 
     @DeleteMapping("/property/{propertyId}")
     public ResponseEntity<String> deletePropertyByID(@PathVariable Integer propertyId){
-        return ResponseEntity.ok(this.dealerService.deletePropertyByID(propertyId));
+        this.dealerService.deletePropertyByID(propertyId);
+        return ResponseEntity.ok("Property has been deleted successfully");
     }
 
     @PutMapping("/property/{propertyId}")
@@ -102,17 +101,20 @@ public class DealerController {
         }catch (Exception e){
             throw new RuntimeException("Failed to phase json to object");
         }
-        return ResponseEntity.ok(this.dealerService.updatePropertyById(propertyCreationRequest,images, propertyId));
+        this.dealerService.updatePropertyById(propertyCreationRequest,images, propertyId);
+        return ResponseEntity.ok("Property updated successfully");
     }
 
     @PostMapping("/property/{propertyId}")
     public ResponseEntity<String> addImageToProperty(@RequestBody MultipartFile[] images, @PathVariable Integer propertyId){
-        return ResponseEntity.ok(this.dealerService.addImagesToProperty(images, propertyId));
+        this.dealerService.addImagesToProperty(images, propertyId);
+        return ResponseEntity.ok("Images added successfully");
     }
 
     @DeleteMapping("property/image/{imageId}")
     public ResponseEntity<String> deleteImageById(@PathVariable Integer imageId){
-        return ResponseEntity.accepted().body(this.dealerService.deleteImageById(imageId));
+        this.dealerService.deleteImageById(imageId);
+        return ResponseEntity.accepted().body("Image deleted successfully");
     }
 
     @PostMapping("/property/plan/add/{propertyId}")
@@ -120,13 +122,60 @@ public class DealerController {
                                                     @RequestPart("images") MultipartFile[] images,
                                                     @RequestPart(value="propertyJsonData")PlanCreationRequest planCreationRequest,
                                                     HttpServletRequest servletRequest) {
-        return ResponseEntity.created(URI.create("")).body(
-                dealerService.addPlan(
-                        propertyId,
-                        planCreationRequest,
-                        servletRequest,
-                        images
-                )
+        dealerService.addPlan(
+                propertyId,
+                planCreationRequest,
+                servletRequest,
+                images
         );
+        return ResponseEntity.created(URI.create("")).body(
+                "New lease plan added to property"
+        );
+    }
+
+    @GetMapping("/property/plans/{propertyId}")
+    public ResponseEntity<List<PlanResponse>> listPlansOfProperty(@PathVariable Integer propertyId) {
+        return ResponseEntity.created(URI.create("")).body(
+            dealerService.listPlansOfProperty(
+                    propertyId
+            )
+        );
+    }
+    @PostMapping("/property/publish/{propertyId}")
+    public ResponseEntity<String> publishProperty(@PathVariable Integer propertyId){
+        this.dealerService.publishProperty(propertyId);
+        return ResponseEntity.ok("Property published");
+    }
+
+    @GetMapping("/applications")
+    public ResponseEntity<List<ApplicationResponse>> listAllApplications(){
+        return ResponseEntity.created(URI.create("")).body(
+                dealerService.listAllApplications()
+        );
+    }
+
+    @GetMapping("/applications/{propertyId}")
+    public ResponseEntity<List<ApplicationResponse>> listAllApplicationsByPropertyId(@PathVariable Integer propertyId){
+        return ResponseEntity.created(URI.create("")).body(
+                dealerService.listAllApplicationsByPropertyId()
+        );
+    }
+
+    @PostMapping("/applications/approve/{applicationId}")
+    public ResponseEntity<String> approveApplication(@PathVariable Integer applicationId){
+        this.dealerService.approveApplication(applicationId);
+        return ResponseEntity.ok("Application approved");
+    }
+
+    @PostMapping("/applications/reject/{applicationId}")
+    public ResponseEntity<String> rejectApplication(@PathVariable Integer applicationId){
+        this.dealerService.rejectApplication(applicationId);
+        return ResponseEntity.ok("Application rejected");
+    }
+
+    @PostMapping("/applications/unread/{applicationId}")
+    public ResponseEntity<String> unreadApplication(@PathVariable Integer applicationId){
+        this.dealerService.unreadApplication(applicationId);
+        return ResponseEntity.ok("Application marked as unread");
     }
 }

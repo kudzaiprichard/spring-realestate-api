@@ -24,11 +24,13 @@ public class CustomerController {
 
     @PostMapping("/bookmarks/add/{propertyId}")
     public ResponseEntity<String> addBookmark(@PathVariable Integer propertyId, HttpServletRequest servletRequest){
-        return ResponseEntity.ok(this.customerService.addBookmark(propertyId, servletRequest));
+        this.customerService.addBookmark(propertyId, servletRequest);
+        return ResponseEntity.ok("Bookmark successfully added");
     }
     @DeleteMapping("/bookmarks/{bookmarkId}")
     public ResponseEntity<String> removeBookmark(@PathVariable Integer bookmarkId, HttpServletRequest servletRequest){
-        return ResponseEntity.ok(this.customerService.removeBookmark(bookmarkId, servletRequest));
+        this.customerService.removeBookmark(bookmarkId, servletRequest);
+        return ResponseEntity.ok("Bookmark successfully removed");
     }
     @GetMapping("/bookmarks")
     public ResponseEntity<List<PropertyResponse>> fetchAllBookmarksByUserId(
@@ -64,7 +66,8 @@ public class CustomerController {
     }
     @PostMapping("/applications/{applicationId}")
     public ResponseEntity<String> withdrawApplication(@PathVariable Integer applicationId, HttpServletRequest servletRequest){
-        return ResponseEntity.ok(this.customerService.withdrawApplication(applicationId, servletRequest));
+        this.customerService.withdrawApplication(applicationId, servletRequest);
+        return ResponseEntity.ok("Application successfully withdrawn");
     }
 
 }

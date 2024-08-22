@@ -68,7 +68,7 @@ public class DealerService {
     }
 
     //Add property
-    public String addProperty(PropertyCreationRequest propertyCreationRequest,
+    public void addProperty(PropertyCreationRequest propertyCreationRequest,
                               HttpServletRequest servletRequest,
                               MultipartFile[] imagesRequest
     ) throws IOException {
@@ -116,7 +116,7 @@ public class DealerService {
         }
         
         //update, save saved property
-        return "Property was successfully saved";
+        //return "Property was successfully saved";
     }
 
     //Fetch a property by property id
@@ -124,15 +124,15 @@ public class DealerService {
         return getPropertyById(propertyId, this.propertyRepository, this.userRepository);
     }
 
-    public String deletePropertyByID(Integer propertyId){
+    public void deletePropertyByID(Integer propertyId){
         this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
         this.propertyRepository.deleteById(propertyId);
-        return "Property has been deleted successfully";
+        //return "Property has been deleted successfully";
     }
 
 
-    public String updatePropertyById(PropertyCreationRequest property, MultipartFile[] imagesRequest , Integer propertyId){
+    public void updatePropertyById(PropertyCreationRequest property, MultipartFile[] imagesRequest , Integer propertyId){
         Property dbProperty = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
         
@@ -187,10 +187,10 @@ public class DealerService {
                 throw new RuntimeException("Could not save image: " + e);
             }
         }
-        return "Property updated successfully";
+        //return "Property updated successfully";
     }
 
-    public String addImagesToProperty(MultipartFile[] imagesRequest, Integer propertyId){
+    public void addImagesToProperty(MultipartFile[] imagesRequest, Integer propertyId){
         List<PropertyImage> propertyImages = new ArrayList<>();
         Property dbProperty = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
@@ -204,20 +204,43 @@ public class DealerService {
             throw new RuntimeException("Could not save image: " + e);
         }
 
-        return "Images added successfully";
+        //return "Images added successfully";
     }
     public List<ImageResponse> fetchAllImagesByPropertyId(int propertyId) {
         return getImageByPropertyId(propertyId, this.propertyImageRepository);
     }
 
-    public String deleteImageById(Integer imageId){
+    public void deleteImageById(Integer imageId){
         this.propertyImageRepository.findById(imageId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find images"));
         this.propertyImageRepository.deleteById(imageId);
-        return "Image deleted successfully";
+        //return "Image deleted successfully";
     }
 
-    public String addPlan(Integer propertyId, PlanCreationRequest planCreationRequest, HttpServletRequest servletRequest, MultipartFile[] images) {
+    public void addPlan(Integer propertyId, PlanCreationRequest planCreationRequest, HttpServletRequest servletRequest, MultipartFile[] images) {
+    }
+
+    public List<PlanResponse> listPlansOfProperty(Integer propertyId) {
         return null;
+    }
+
+    public void publishProperty(Integer propertyId) {
+    }
+
+    public List<ApplicationResponse> listAllApplications() {
+        return null;
+    }
+
+    public List<ApplicationResponse> listAllApplicationsByPropertyId() {
+        return null;
+    }
+
+    public void approveApplication(Integer applicationId) {
+    }
+
+    public void rejectApplication(Integer applicationId) {
+    }
+
+    public void unreadApplication(Integer applicationId) {
     }
 }

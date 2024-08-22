@@ -1,14 +1,12 @@
 package com.intela.realestatebackend.requestResponse;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.intela.realestatebackend.models.application.CustomerInformation;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor
-public class ApplicationResponse {
-    private Integer applicationId;
+public class ApplicationResponse extends CustomerInformation {
 }

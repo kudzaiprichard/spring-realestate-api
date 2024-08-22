@@ -1,9 +1,6 @@
 package com.intela.realestatebackend.controllers;
 
-import com.intela.realestatebackend.requestResponse.AuthenticateRequest;
-import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
-import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
-import com.intela.realestatebackend.requestResponse.RegisterRequest;
+import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +35,14 @@ public class AuthController {
     ){
         return ResponseEntity.accepted()
                 .body(authService.authenticate(request));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<PasswordResetResponse> resetPassword(
+            @RequestBody PasswordResetRequest request
+    ){
+        return ResponseEntity.accepted()
+                .body(authService.resetPassword(request));
     }
 
     @PostMapping("/refreshToken")

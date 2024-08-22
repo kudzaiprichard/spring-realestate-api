@@ -6,10 +6,7 @@ import com.intela.realestatebackend.models.archetypes.TokenType;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
-import com.intela.realestatebackend.requestResponse.AuthenticateRequest;
-import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
-import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
-import com.intela.realestatebackend.requestResponse.RegisterRequest;
+import com.intela.realestatebackend.requestResponse.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -164,5 +161,9 @@ public class AuthService {
 
             throw new RuntimeException("Please enter valid refresh token");
         }
+    }
+
+    public PasswordResetResponse resetPassword(PasswordResetRequest request) {
+        return null;
     }
 }

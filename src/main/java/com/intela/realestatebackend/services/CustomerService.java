@@ -82,7 +82,7 @@ public class CustomerService {
             return null;
     }
 
-    public String addBookmark(Integer propertyId, HttpServletRequest servletRequest){
+    public void addBookmark(Integer propertyId, HttpServletRequest servletRequest){
 
         if(this.bookmarkRepository.findByPropertyId(propertyId) != null){
             throw new RuntimeException("Property already exists in your bookmarks");
@@ -97,11 +97,9 @@ public class CustomerService {
                 .property(property)
                 .build();
         this.bookmarkRepository.save(bookmark);
-        return "Bookmark added successfully";
     }
 
-    public String removeBookmark(Integer bookmarkId, HttpServletRequest servletRequest) {
-        return null;
+    public void removeBookmark(Integer bookmarkId, HttpServletRequest servletRequest) {
     }
 
     public ApplicationResponse createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request) {
@@ -116,7 +114,6 @@ public class CustomerService {
         return null;
     }
 
-    public String withdrawApplication(Integer applicationId, HttpServletRequest servletRequest) {
-        return null;
+    public void withdrawApplication(Integer applicationId, HttpServletRequest servletRequest) {
     }
 }
