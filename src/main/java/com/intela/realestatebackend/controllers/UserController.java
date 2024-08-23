@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
     @PostMapping("/")
     public ResponseEntity<UpdateProfileResponse> updateProfile(
             HttpServletRequest servletRequest,
             @RequestBody UpdateProfileRequest request
-    ){
+    ) {
         return ResponseEntity.ok().body(userService.updateProfile(servletRequest, request));
     }
 
@@ -28,7 +29,7 @@ public class UserController {
     public ResponseEntity<RetrieveProfileResponse> retrieveProfile(
             HttpServletRequest servletRequest,
             @RequestBody RetrieveProfileRequest request
-    ){
+    ) {
         return ResponseEntity.ok().body(userService.retrieveProfile(servletRequest, request));
     }
 }

@@ -47,7 +47,7 @@ public class User implements UserDetails{
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<CustomerInformation> customerInformations;
+    private Set<CustomerInformation> customerInformation;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

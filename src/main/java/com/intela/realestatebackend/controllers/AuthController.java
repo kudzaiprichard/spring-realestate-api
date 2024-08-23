@@ -18,21 +18,21 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/user")
-    public ResponseEntity<LoggedUserResponse> getLoggedInUser(HttpServletRequest request){
+    public ResponseEntity<LoggedUserResponse> getLoggedInUser(HttpServletRequest request) {
         return ResponseEntity.ok(this.authService.fetchLoggedInUserByToken(request));
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
-    ){
+    ) {
         return ResponseEntity.created(URI.create("")).body(authService.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticateRequest request
-    ){
+    ) {
         return ResponseEntity.accepted()
                 .body(authService.authenticate(request));
     }
@@ -40,7 +40,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<PasswordResetResponse> resetPassword(
             @RequestBody PasswordResetRequest request
-    ){
+    ) {
         return ResponseEntity.accepted()
                 .body(authService.resetPassword(request));
     }

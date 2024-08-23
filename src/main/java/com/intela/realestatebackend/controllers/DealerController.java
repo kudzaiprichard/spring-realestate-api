@@ -26,12 +26,13 @@ import java.util.Optional;
 public class DealerController {
     private final DealerService dealerService;
     private final ObjectMapper objectMapper;
+
     @PostMapping("/property/add")
     public ResponseEntity<String> addProperty(
             @RequestPart("images") MultipartFile[] images,
-            @RequestPart(value="propertyJsonData") PropertyCreationRequest propertyCreationRequest,
+            @RequestPart(value = "propertyJsonData") PropertyCreationRequest propertyCreationRequest,
             HttpServletRequest servletRequest
-    ){
+    ) {
         try {
             dealerService.addProperty(
                     propertyCreationRequest,
@@ -53,19 +54,19 @@ public class DealerController {
             @RequestParam Optional<Integer> pageNumber,
             @RequestParam Optional<String> sortBy,
             @RequestParam Optional<Integer> amount
-    ){
+    ) {
         Pageable pageRequest = PageRequest.of(
                 pageNumber.orElse(0),
                 amount.orElse(20),
                 Sort.Direction.ASC,
                 sortBy.orElse("id")
         );
-        return ResponseEntity.ok(this.dealerService.fetchAllPropertiesByUserId(request,pageRequest));
+        return ResponseEntity.ok(this.dealerService.fetchAllPropertiesByUserId(request, pageRequest));
     }
 
     //Todo: Endpoint should return images as a list
     @GetMapping("/property/images/{propertyId}")
-    public ResponseEntity<byte[]> fetchAllImagesByPropertyId(@PathVariable int propertyId){
+    public ResponseEntity<byte[]> fetchAllImagesByPropertyId(@PathVariable int propertyId) {
         List<ImageResponse> images = this.dealerService.fetchAllImagesByPropertyId(propertyId);
         List<byte[]> imagesByte = new ArrayList<>();
 
@@ -78,12 +79,12 @@ public class DealerController {
     }
 
     @GetMapping("/property/{propertyId}")
-    public ResponseEntity<PropertyResponse> fetchPropertyById(@PathVariable Integer propertyId){
+    public ResponseEntity<PropertyResponse> fetchPropertyById(@PathVariable Integer propertyId) {
         return ResponseEntity.ok(this.dealerService.fetchPropertyById(propertyId));
     }
 
     @DeleteMapping("/property/{propertyId}")
-    public ResponseEntity<String> deletePropertyByID(@PathVariable Integer propertyId){
+    public ResponseEntity<String> deletePropertyByID(@PathVariable Integer propertyId) {
         this.dealerService.deletePropertyByID(propertyId);
         return ResponseEntity.ok("Property has been deleted successfully");
     }
@@ -92,27 +93,27 @@ public class DealerController {
     public ResponseEntity<String> updatePropertyById(
             @PathVariable Integer propertyId,
             @RequestParam("images") MultipartFile[] images,
-            @RequestParam(value="propertyJsonData")String propertyJsonData
-    ){
+            @RequestParam(value = "propertyJsonData") String propertyJsonData
+    ) {
         PropertyCreationRequest propertyCreationRequest;
-        try{
+        try {
             propertyCreationRequest = objectMapper.readValue(propertyJsonData, PropertyCreationRequest.class);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Failed to phase json to object");
         }
-        this.dealerService.updatePropertyById(propertyCreationRequest,images, propertyId);
+        this.dealerService.updatePropertyById(propertyCreationRequest, images, propertyId);
         return ResponseEntity.ok("Property updated successfully");
     }
 
     @PostMapping("/property/{propertyId}")
-    public ResponseEntity<String> addImageToProperty(@RequestBody MultipartFile[] images, @PathVariable Integer propertyId){
+    public ResponseEntity<String> addImageToProperty(@RequestBody MultipartFile[] images, @PathVariable Integer propertyId) {
         this.dealerService.addImagesToProperty(images, propertyId);
         return ResponseEntity.ok("Images added successfully");
     }
 
     @DeleteMapping("property/image/{imageId}")
-    public ResponseEntity<String> deleteImageById(@PathVariable Integer imageId){
+    public ResponseEntity<String> deleteImageById(@PathVariable Integer imageId) {
         this.dealerService.deleteImageById(imageId);
         return ResponseEntity.accepted().body("Image deleted successfully");
     }
@@ -120,7 +121,7 @@ public class DealerController {
     @PostMapping("/property/plan/add/{propertyId}")
     public ResponseEntity<String> addPlanToProperty(@PathVariable Integer propertyId,
                                                     @RequestPart("images") MultipartFile[] images,
-                                                    @RequestPart(value="propertyJsonData")PlanCreationRequest planCreationRequest,
+                                                    @RequestPart(value = "propertyJsonData") PlanCreationRequest planCreationRequest,
                                                     HttpServletRequest servletRequest) {
         dealerService.addPlan(
                 propertyId,
@@ -136,45 +137,46 @@ public class DealerController {
     @GetMapping("/property/plans/{propertyId}")
     public ResponseEntity<List<PlanResponse>> listPlansOfProperty(@PathVariable Integer propertyId) {
         return ResponseEntity.created(URI.create("")).body(
-            dealerService.listPlansOfProperty(
-                    propertyId
-            )
+                dealerService.listPlansOfProperty(
+                        propertyId
+                )
         );
     }
+
     @PostMapping("/property/publish/{propertyId}")
-    public ResponseEntity<String> publishProperty(@PathVariable Integer propertyId){
+    public ResponseEntity<String> publishProperty(@PathVariable Integer propertyId) {
         this.dealerService.publishProperty(propertyId);
         return ResponseEntity.ok("Property published");
     }
 
     @GetMapping("/applications")
-    public ResponseEntity<List<ApplicationResponse>> listAllApplications(){
+    public ResponseEntity<List<ApplicationResponse>> listAllApplications() {
         return ResponseEntity.created(URI.create("")).body(
                 dealerService.listAllApplications()
         );
     }
 
     @GetMapping("/applications/{propertyId}")
-    public ResponseEntity<List<ApplicationResponse>> listAllApplicationsByPropertyId(@PathVariable Integer propertyId){
+    public ResponseEntity<List<ApplicationResponse>> listAllApplicationsByPropertyId(@PathVariable Integer propertyId) {
         return ResponseEntity.created(URI.create("")).body(
                 dealerService.listAllApplicationsByPropertyId()
         );
     }
 
     @PostMapping("/applications/approve/{applicationId}")
-    public ResponseEntity<String> approveApplication(@PathVariable Integer applicationId){
+    public ResponseEntity<String> approveApplication(@PathVariable Integer applicationId) {
         this.dealerService.approveApplication(applicationId);
         return ResponseEntity.ok("Application approved");
     }
 
     @PostMapping("/applications/reject/{applicationId}")
-    public ResponseEntity<String> rejectApplication(@PathVariable Integer applicationId){
+    public ResponseEntity<String> rejectApplication(@PathVariable Integer applicationId) {
         this.dealerService.rejectApplication(applicationId);
         return ResponseEntity.ok("Application rejected");
     }
 
     @PostMapping("/applications/unread/{applicationId}")
-    public ResponseEntity<String> unreadApplication(@PathVariable Integer applicationId){
+    public ResponseEntity<String> unreadApplication(@PathVariable Integer applicationId) {
         this.dealerService.unreadApplication(applicationId);
         return ResponseEntity.ok("Application marked as unread");
     }
