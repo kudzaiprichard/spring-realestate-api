@@ -95,7 +95,7 @@ public class AuthService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticateRequest request){
+    public AuthenticationResponse authenticate(AuthenticationRequest request){
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()-> new EntityNotFoundException("User email does not exist"));

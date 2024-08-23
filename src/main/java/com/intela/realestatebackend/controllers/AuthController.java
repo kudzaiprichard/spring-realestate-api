@@ -31,7 +31,7 @@ public class AuthController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticateRequest request
+            @RequestBody AuthenticationRequest request
     ) {
         return ResponseEntity.accepted()
                 .body(authService.authenticate(request));
