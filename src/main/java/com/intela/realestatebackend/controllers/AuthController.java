@@ -44,7 +44,26 @@ public class AuthController {
         return ResponseEntity.accepted()
                 .body(authService.resetPassword(request));
     }
+    /*
+    Manage access and refresh tokens
+        In this case, the flow is the following one:
 
+        User logins into the application (including username and password)
+
+        Your backend application returns any required credentials information and:
+
+        2.1 Access JWT token with an expired time usually "low" (15, 30 minutes, etc).
+
+        2.2 Refresh JWT token with an expired time greater than access one.
+
+        From now, your frontend application will use access token in the Authorization header for every request.
+
+        When backend returns 401, the frontend application will try to use refresh token (using an specific endpoint) to get new credentials, without forcing the user to login again.
+
+        Refresh token flow (This is only an example, usually only the refresh token is sent)
+
+        If there is no problem, then the user will be able to continue using the application. If backend returns a new 401 => frontend should redirect to login page.
+    */
     @PostMapping("/refreshToken")
     public void refreshToken(
             HttpServletRequest request,
