@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class AdminService {
     public List<RetrieveProfileResponse> listAllProfiles() {
         // Retrieve profiles where property_id is null
         return customerInformationRepository.findAll().stream()
-                .filter(user -> user.getProperty() == null)
+                .filter(user -> Util.isCustomerProfile(user))
                 .map(user -> mapToRetrieveProfileResponse(user))
                 .collect(Collectors.toList());
     }
@@ -37,9 +38,9 @@ public class AdminService {
     }
 
     public UpdateProfileResponse updateProfile(Integer userId, UpdateProfileRequest request) throws IllegalAccessException {
-        // Find the user by userId
-        CustomerInformation user = customerInformationRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Find the CustomerInformation associated with the userId where propertyId is null
+        CustomerInformation user = customerInformationRepository.findByUserIdAndPropertyIsNull(userId)
+                .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
 
         // Update user details based on UpdateProfileRequest
         Map<String, Object> updatedFields = updateProfileFromRequest(user, request);
@@ -73,6 +74,17 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
+    public void banAccount(Integer userId, Timestamp bannedTill) {
+        // Retrieve the user by userId
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Set the bannedTill timestamp
+        user.setBannedTill(bannedTill);
+
+        // Save the updated user back to the repository
+        userRepository.save(user);
+    }
     // Helper methods for mapping and updating
 
     private RetrieveProfileResponse mapToRetrieveProfileResponse(CustomerInformation user) {
@@ -185,5 +197,4 @@ public class AdminService {
 
         return updatedFields;
     }
-
 }

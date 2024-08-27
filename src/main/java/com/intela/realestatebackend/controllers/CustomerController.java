@@ -53,18 +53,19 @@ public class CustomerController {
         return ResponseEntity.ok(this.customerService.fetchBookmarkById(bookmarkId, servletRequest));
     }
     @PostMapping("/applications/create/{propertyId}")
-    public ResponseEntity<ApplicationResponse> createApplication(@PathVariable Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request){
-        return ResponseEntity.ok(this.customerService.createApplication(propertyId, servletRequest, request));
+    public ResponseEntity<String> createApplication(@PathVariable Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request){
+        this.customerService.createApplication(propertyId, servletRequest, request);
+        return ResponseEntity.ok("Application created");
     }
     @GetMapping("/applications")
     public ResponseEntity<List<ApplicationResponse>> getAllApplications(HttpServletRequest servletRequest){
         return ResponseEntity.ok(this.customerService.getAllApplications(servletRequest));
     }
     @GetMapping("/applications/{applicationId}")
-    public ResponseEntity<List<ApplicationResponse>> getApplication(@PathVariable Integer applicationId, HttpServletRequest servletRequest){
+    public ResponseEntity<ApplicationResponse> getApplication(@PathVariable Integer applicationId, HttpServletRequest servletRequest){
         return ResponseEntity.ok(this.customerService.getApplication(applicationId, servletRequest));
     }
-    @PostMapping("/applications/{applicationId}")
+    @DeleteMapping("/applications/{applicationId}")
     public ResponseEntity<String> withdrawApplication(@PathVariable Integer applicationId, HttpServletRequest servletRequest){
         this.customerService.withdrawApplication(applicationId, servletRequest);
         return ResponseEntity.ok("Application successfully withdrawn");

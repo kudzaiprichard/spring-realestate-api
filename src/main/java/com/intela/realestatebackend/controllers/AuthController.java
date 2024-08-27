@@ -39,10 +39,11 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<PasswordResetResponse> resetPassword(
+            HttpServletRequest servletRequest,
             @RequestBody PasswordResetRequest request
     ) {
         return ResponseEntity.accepted()
-                .body(authService.resetPassword(request));
+                .body(authService.resetPassword(servletRequest, request));
     }
     /*
     Manage access and refresh tokens

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @RestController
@@ -51,5 +52,10 @@ public class AdminController {
             throw new RuntimeException(e);
         }
     }
-    //TODO: Implement ban user
+
+    @PostMapping("/user-management/ban/{userId}")
+    public ResponseEntity<String> banAccount(@PathVariable Integer userId, @RequestBody Timestamp bannedTill){
+        this.adminService.banAccount(userId, bannedTill);
+        return ResponseEntity.ok("User "+userId+"banned");
+    }
 }

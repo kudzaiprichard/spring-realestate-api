@@ -163,7 +163,26 @@ public class AuthService {
         }
     }
 
-    public PasswordResetResponse resetPassword(PasswordResetRequest request) {
-        return null;
+    public PasswordResetResponse resetPassword(HttpServletRequest servletRequest, PasswordResetRequest request) {
+        // Extract user information from the servletRequest
+        String userEmail = servletRequest.getUserPrincipal().getName(); // Assuming user email is the principal's name
+
+        // Retrieve the user by email
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Encrypt the new password
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+
+        // Update the user's password
+        user.setPassword(encodedPassword);
+
+        // Save the updated user
+        userRepository.save(user);
+
+        // Return a successful PasswordResetResponse
+        PasswordResetResponse response = new PasswordResetResponse();
+
+        return response;
     }
 }

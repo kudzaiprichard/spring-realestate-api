@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.services;
 
+import com.intela.realestatebackend.models.application.CustomerInformation;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
@@ -7,10 +8,12 @@ import com.intela.realestatebackend.repositories.BookmarkRepository;
 import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.repositories.application.CustomerInformationRepository;
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
 import com.intela.realestatebackend.requestResponse.ImageResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
+import com.intela.realestatebackend.util.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.intela.realestatebackend.util.Util.*;
 
@@ -29,6 +33,7 @@ public class CustomerService {
     private final PropertyRepository propertyRepository;
     private final PropertyImageRepository propertyImageRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final CustomerInformationRepository customerInformationRepository;
     private final JwtService jwtService;
 
     //Todo: Add a search/filter/sorting functionality on fetching all filters
@@ -100,20 +105,131 @@ public class CustomerService {
     }
 
     public void removeBookmark(Integer bookmarkId, HttpServletRequest servletRequest) {
+        // Retrieve the user by token from the request
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+
+        // Find the bookmark by its ID
+        Bookmark bookmark = this.bookmarkRepository.findById(bookmarkId)
+                .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
+
+        // Check if the bookmark belongs to the user
+        if (!bookmark.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to remove this bookmark");
+        }
+
+        // Remove the bookmark from the repository
+        this.bookmarkRepository.delete(bookmark);
     }
 
-    public ApplicationResponse createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request) {
-        return null;
+    public void createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request) {
+        // Retrieve the user by token from the request
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+
+        // Find the property by its ID
+        Property property = this.propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new EntityNotFoundException("Property not found"));
+
+        // Create a new CustomerInformation entity using the request data
+        CustomerInformation customerInformation = CustomerInformation.builder()
+                .user(user)
+                .property(property)
+                .contactDetails(request.getContactDetails())
+                .emergencyContacts(request.getEmergencyContacts())
+                .residentialHistories(request.getResidentialHistories())
+                .employmentHistories(request.getEmploymentHistories())
+                .personalDetails(request.getPersonalDetails())
+                .ids(request.getIds())
+                .references(request.getReferences())
+                .build();
+
+        // Save the CustomerInformation entity
+        this.customerInformationRepository.save(customerInformation);
     }
 
     public List<ApplicationResponse> getAllApplications(HttpServletRequest servletRequest) {
-        return null;
+        // Retrieve the user by token from the request
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+
+        // Fetch all CustomerInformation entities for the user where propertyId is not null
+        List<CustomerInformation> customerInformations = this.customerInformationRepository.findByUser(user);
+
+        // Filter out entries where property is null
+        List<ApplicationResponse> applications = customerInformations.stream()
+                .filter(info -> info.getProperty() != null)
+                .map(info -> {
+                    // Convert CustomerInformation to ApplicationResponse
+                    ApplicationResponse response = new ApplicationResponse();
+                    response.setId(info.getId());
+                    response.setUser(info.getUser());
+                    response.setProperty(info.getProperty());
+                    response.setContactDetails(info.getContactDetails());
+                    response.setEmergencyContacts(info.getEmergencyContacts());
+                    response.setResidentialHistories(info.getResidentialHistories());
+                    response.setEmploymentHistories(info.getEmploymentHistories());
+                    response.setPersonalDetails(info.getPersonalDetails());
+                    response.setIds(info.getIds());
+                    response.setReferences(info.getReferences());
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return applications;
     }
 
-    public List<ApplicationResponse> getApplication(Integer applicationId, HttpServletRequest servletRequest) {
-        return null;
+    public ApplicationResponse getApplication(Integer applicationId, HttpServletRequest servletRequest) {
+        // Retrieve the user by token from the request
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+
+        // Find the CustomerInformation by its ID
+        CustomerInformation customerInformation = this.customerInformationRepository.findById(applicationId)
+                .orElseThrow(() -> new EntityNotFoundException("Application not found"));
+
+        // Check if the CustomerInformation belongs to the user
+        if (!customerInformation.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to access this application");
+        }
+
+        // Ensure propertyId is not null
+        if (Util.isCustomerProfile(customerInformation)) {
+            throw new RuntimeException("This application is not associated with any property");
+        }
+
+        // Convert CustomerInformation to ApplicationResponse
+        ApplicationResponse response = new ApplicationResponse();
+        response.setId(customerInformation.getId());
+        response.setUser(customerInformation.getUser());
+        response.setProperty(customerInformation.getProperty());
+        response.setContactDetails(customerInformation.getContactDetails());
+        response.setEmergencyContacts(customerInformation.getEmergencyContacts());
+        response.setResidentialHistories(customerInformation.getResidentialHistories());
+        response.setEmploymentHistories(customerInformation.getEmploymentHistories());
+        response.setPersonalDetails(customerInformation.getPersonalDetails());
+        response.setIds(customerInformation.getIds());
+        response.setReferences(customerInformation.getReferences());
+
+        // Return the ApplicationResponse
+        return response;
     }
 
     public void withdrawApplication(Integer applicationId, HttpServletRequest servletRequest) {
+        // Retrieve the user by token from the request
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+
+        // Find the CustomerInformation by its ID
+        CustomerInformation customerInformation = this.customerInformationRepository.findById(applicationId)
+                .orElseThrow(() -> new EntityNotFoundException("Application not found"));
+
+        // Check if the CustomerInformation belongs to the user
+        if (!customerInformation.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to withdraw this application");
+        }
+
+        // Ensure propertyId is not null
+        if (Util.isCustomerProfile(customerInformation)) {
+            throw new RuntimeException("This application cannot be withdrawn as it is not associated with any property");
+        }
+
+        // Delete the CustomerInformation (withdraw the application)
+        this.customerInformationRepository.delete(customerInformation);
     }
 }
