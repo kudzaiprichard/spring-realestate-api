@@ -30,7 +30,7 @@ public class CustomerInformation {
     private Property property;
 
     @OneToMany(mappedBy = "profile")
-    private Set<ContactDetails> contactDetails;
+    private ContactDetails contactDetails;
 
     @OneToMany(mappedBy = "profile")
     private Set<EmergencyContact> emergencyContacts;

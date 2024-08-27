@@ -1,10 +1,7 @@
 package com.intela.realestatebackend.controllers;
 
-import com.intela.realestatebackend.requestResponse.RetrieveProfileResponse;
-import com.intela.realestatebackend.requestResponse.UpdateProfileRequest;
-import com.intela.realestatebackend.requestResponse.UpdateProfileResponse;
+import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.AdminService;
-import com.intela.realestatebackend.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,19 +18,38 @@ public class AdminController {
         return ResponseEntity.ok("ADMIN::TEST");
     }
 
+    @GetMapping("/user-management/profiles")
+    public ResponseEntity<List<RetrieveProfileResponse>> listAllProfiles(){
+        return ResponseEntity.ok(this.adminService.listAllProfiles());
+    }
+
     @GetMapping("/user-management")
-    public ResponseEntity<List<RetrieveProfileResponse>> listAllAccounts(){
+    public ResponseEntity<List<RetrieveAccountResponse>> listAllAccounts(){
         return ResponseEntity.ok(this.adminService.listAllAccounts());
     }
 
     @DeleteMapping("/user-management/{userId}")
     public ResponseEntity<String> deleteAccount(@PathVariable Integer userId){
-        this.adminService.deleteAccount();
+        this.adminService.deleteAccount(userId);
         return ResponseEntity.ok("User "+userId+"deleted");
     }
 
-    @PostMapping("/user-management/{userId}")
-    public ResponseEntity<UpdateProfileResponse> updateAccount(@PathVariable Integer userId, @RequestBody UpdateProfileRequest request){
-        return ResponseEntity.ok(this.adminService.updateAccount());
+    @PostMapping("/user-management/profiles/{userId}")
+    public ResponseEntity<UpdateProfileResponse> updateProfile(@PathVariable Integer userId, @RequestBody UpdateProfileRequest request){
+        try {
+            return ResponseEntity.ok(this.adminService.updateProfile(userId, request));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    @PostMapping("/user-management/{userId}")
+    public ResponseEntity<UpdateAccountResponse> updateAccount(@PathVariable Integer userId, @RequestBody UpdateAccountRequest request){
+        try {
+            return ResponseEntity.ok(this.adminService.updateAccount(userId, request));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    //TODO: Implement ban user
 }

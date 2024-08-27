@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Deflater;
@@ -143,5 +144,19 @@ public class Util {
         );
 
         return imageResponses;
+    }
+
+    public static String getQualifiedFieldName(Object parentObject, Object fieldObject) throws IllegalAccessException {
+        Class<?> parentClass = parentObject.getClass();
+
+        for (Field field : parentClass.getDeclaredFields()) {
+            field.setAccessible(true);  // In case the field is private
+
+            if (field.get(parentObject) == fieldObject) {
+                return parentClass.getName() + "." + field.getName();
+            }
+        }
+
+        throw new IllegalArgumentException("The given field object is not a field of the parent object.");
     }
 }
