@@ -19,7 +19,7 @@ public class ContactDetails {
     private String contactNumber;
     private String contactEmail;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "profile_id")
     private CustomerInformation profile;
 }

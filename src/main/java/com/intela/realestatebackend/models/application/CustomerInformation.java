@@ -29,7 +29,7 @@ public class CustomerInformation {
     @JoinColumn(name = "property_id")
     private Property property;
 
-    @OneToMany(mappedBy = "profile")
+    @OneToOne(mappedBy = "profile")
     private ContactDetails contactDetails;
 
     @OneToMany(mappedBy = "profile")
