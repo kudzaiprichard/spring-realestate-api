@@ -25,7 +25,7 @@ public class CustomerInformation {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "property_id")
     private Property property;
 
