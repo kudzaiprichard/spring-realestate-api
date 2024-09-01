@@ -1,7 +1,7 @@
-package com.intela.realestatebackend.repositories.application;
+package com.intela.realestatebackend.repositories;
 
 import com.intela.realestatebackend.models.User;
-import com.intela.realestatebackend.models.application.CustomerInformation;
+import com.intela.realestatebackend.models.profile.CustomerInformation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface CustomerInformationRepository extends JpaRepository<CustomerInformation, Integer> {
     List<CustomerInformation> findByUser(User user);
 
-    Optional<CustomerInformation> findByUserIdAndPropertyIsNull(Integer userId);
+    Optional<CustomerInformation> findByUserId(Integer userId);
 }

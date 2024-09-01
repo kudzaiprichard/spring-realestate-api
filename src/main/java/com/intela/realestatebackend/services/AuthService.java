@@ -185,4 +185,29 @@ public class AuthService {
 
         return response;
     }
+
+    private RetrieveAccountResponse mapToRetrieveAccountResponse(User user) {
+        if (user == null) {
+            return null;
+        }
+
+        RetrieveAccountResponse response = new RetrieveAccountResponse();
+
+        // Assuming RetrieveAccountResponse has the necessary setters and User has the necessary getters
+        response.setId(user.getId()); // or other equivalent field
+        response.setEmail(user.getEmail());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setMobileNumber(user.getMobileNumber());
+        // Map other fields as necessary
+
+        return response;
+    }
+    public RetrieveAccountResponse getUserByAccessToken(String accessToken) {
+        return mapToRetrieveAccountResponse(tokenRepository.findUserByAccessToken(accessToken));
+    }
+
+    public RetrieveAccountResponse getUserByRefreshToken(String refreshToken) {
+        return mapToRetrieveAccountResponse(tokenRepository.findUserByRefreshToken(refreshToken));
+    }
 }

@@ -1,6 +1,6 @@
 package com.intela.realestatebackend.requestResponse;
 
-import com.intela.realestatebackend.models.application.CustomerInformation;
+import com.intela.realestatebackend.models.profile.CustomerInformation;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

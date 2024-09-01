@@ -123,12 +123,16 @@ public class DealerController {
                                                     @RequestPart("images") MultipartFile[] images,
                                                     @RequestPart(value = "propertyJsonData") PlanCreationRequest planCreationRequest,
                                                     HttpServletRequest servletRequest) {
-        dealerService.addPlan(
-                propertyId,
-                planCreationRequest,
-                servletRequest,
-                images
-        );
+        try {
+            dealerService.addPlan(
+                    propertyId,
+                    planCreationRequest,
+                    servletRequest,
+                    images
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.created(URI.create("")).body(
                 "New lease plan added to property"
         );
@@ -143,12 +147,6 @@ public class DealerController {
         );
     }
 
-    @PostMapping("/property/publish/{propertyId}")
-    public ResponseEntity<String> publishProperty(@PathVariable Integer propertyId) {
-        this.dealerService.publishProperty(propertyId);
-        return ResponseEntity.ok("Property published");
-    }
-
     @GetMapping("/applications")
     public ResponseEntity<List<ApplicationResponse>> listAllApplications() {
         return ResponseEntity.created(URI.create("")).body(
@@ -159,7 +157,7 @@ public class DealerController {
     @GetMapping("/applications/{propertyId}")
     public ResponseEntity<List<ApplicationResponse>> listAllApplicationsByPropertyId(@PathVariable Integer propertyId) {
         return ResponseEntity.created(URI.create("")).body(
-                dealerService.listAllApplicationsByPropertyId()
+                dealerService.listAllApplicationsByPropertyId(propertyId)
         );
     }
 

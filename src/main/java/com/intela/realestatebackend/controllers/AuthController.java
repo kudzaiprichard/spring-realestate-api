@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.controllers;
 
+import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -72,5 +73,15 @@ public class AuthController {
 
     ) throws IOException {
         authService.refreshToken(request, response);
+    }
+
+    @GetMapping("/userByAccessToken")
+    public ResponseEntity<RetrieveAccountResponse> getUserByAccessToken(@RequestParam String accessToken) {
+        return ResponseEntity.ok(authService.getUserByAccessToken(accessToken));
+    }
+
+    @GetMapping("/userByRefreshToken")
+    public ResponseEntity<RetrieveAccountResponse> getUserByRefreshToken(@RequestParam String refreshToken) {
+        return ResponseEntity.ok(authService.getUserByRefreshToken(refreshToken));
     }
 }

@@ -1,25 +1,28 @@
-package com.intela.realestatebackend.models.application;
+package com.intela.realestatebackend.models.profile;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "contact_details")
+@Table(name = "personal_details")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ContactDetails {
+public class PersonalDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String contactNumber;
-    private String contactEmail;
+    private String title;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String dob;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "profile_id")
     private CustomerInformation profile;
 }

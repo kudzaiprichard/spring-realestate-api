@@ -1,4 +1,4 @@
-package com.intela.realestatebackend.models.application;
+package com.intela.realestatebackend.models.profile;
 
 import jakarta.persistence.*;
 import lombok.*;

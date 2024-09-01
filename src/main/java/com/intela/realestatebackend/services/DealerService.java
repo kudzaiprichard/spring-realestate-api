@@ -1,13 +1,13 @@
 package com.intela.realestatebackend.services;
 
-import com.intela.realestatebackend.models.property.Feature;
-import com.intela.realestatebackend.models.property.PropertyImage;
-import com.intela.realestatebackend.models.property.Property;
+import com.intela.realestatebackend.models.profile.ApplicationStatus;
+import com.intela.realestatebackend.models.property.*;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.FeatureRepository;
 import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.repositories.application.ApplicationRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 import static com.intela.realestatebackend.util.Util.*;
@@ -32,6 +33,8 @@ public class DealerService {
     private final PropertyImageRepository propertyImageRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final ApplicationRepository applicationRepository;
+    private final PropertyImageService propertyImageService;
 
 
     private void multipartFileToImageList(MultipartFile[] imagesRequest, List<PropertyImage> propertyImages) {
@@ -217,30 +220,100 @@ public class DealerService {
         //return "Image deleted successfully";
     }
 
-    public void addPlan(Integer propertyId, PlanCreationRequest planCreationRequest, HttpServletRequest servletRequest, MultipartFile[] images) {
+    public void addPlan(Integer propertyId, PlanCreationRequest planCreationRequest, HttpServletRequest servletRequest, MultipartFile[] images) throws IOException {
+        // Step 1: Retrieve the property based on the propertyId
+        Property parentListing = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new IllegalArgumentException("Property not found with id: " + propertyId));
+
+        // Step 2: Create a new Plan object
+        Plan plan = new Plan();
+        plan.setLocation(planCreationRequest.getLocation());
+        plan.setDescription(planCreationRequest.getDescription());
+        plan.setPrice(planCreationRequest.getPrice());
+        plan.setParentListing(parentListing); // Step 3: Ensure parentListing is set
+
+        // Step 4: Handle images (optional)
+        if (images != null && images.length > 0) {
+            List<PropertyImage> propertyImages = new ArrayList<>();
+            for (MultipartFile image : images) {
+                // Assuming imageService stores the image and returns the URL
+                PropertyImage img = propertyImageService.storePropertyImage(image, plan);
+                propertyImages.add(img);
+            }
+            plan.setPropertyImages(propertyImages); // Assuming Plan has a field to store image URLs
+        }
+
+        // Step 5: Persist the Plan object
+        propertyRepository.save(plan);
     }
 
     public List<PlanResponse> listPlansOfProperty(Integer propertyId) {
-        return null;
-    }
+        // Step 1: Retrieve the Property by its ID
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new IllegalArgumentException("Property not found with id: " + propertyId));
 
-    public void publishProperty(Integer propertyId) {
+        // Step 2: Retrieve the list of Plans associated with the Property
+        List<Plan> plans = propertyRepository.findByParentListing(property);
+
+        // Step 3: Convert the list of Plan entities to PlanResponse DTOs
+        return plans.stream()
+                .map(plan -> new PlanResponse())
+                .collect(Collectors.toList());
     }
 
     public List<ApplicationResponse> listAllApplications() {
-        return null;
+        return applicationRepository.findAll().stream()
+                .map(this::mapToApplicationResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<ApplicationResponse> listAllApplicationsByPropertyId() {
-        return null;
+    private ApplicationResponse mapToApplicationResponse(Application application) {
+        if (application == null) {
+            return null;
+        }
+
+        ApplicationResponse response = new ApplicationResponse();
+
+        // Assuming ApplicationResponse has setters and Application has getters
+        response.setId(application.getId());
+        response.setProperty(application.getProperty()); // Assuming Application has a Property object
+        response.setPersonalDetails(application.getPersonalDetails()); // Assuming CustomerInformation has a getFullName method
+        response.setStatus(application.getStatus());
+        response.setSubmittedDate(application.getSubmittedDate());
+
+        // Map other fields as necessary
+        // Example: response.setSomeField(application.getSomeField());
+
+        return response;
+    }
+
+    public List<ApplicationResponse> listAllApplicationsByPropertyId(Integer propertyId) {
+        return applicationRepository.findByPropertyId(propertyId).stream()
+                .map(this::mapToApplicationResponse)
+                .collect(Collectors.toList());
     }
 
     public void approveApplication(Integer applicationId) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("Application not found with id: " + applicationId));
+
+        application.setStatus(ApplicationStatus.APPROVED); // Assuming you have a `status` field in `Application`
+        applicationRepository.save(application);
     }
 
     public void rejectApplication(Integer applicationId) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("Application not found with id: " + applicationId));
+
+        application.setStatus(ApplicationStatus.REJECTED); // Assuming you have a `status` field in `Application`
+        applicationRepository.save(application);
     }
 
     public void unreadApplication(Integer applicationId) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("Application not found with id: " + applicationId));
+
+        application.setStatus(ApplicationStatus.UNREAD); // Assuming you have a `status` field in `Application`
+        applicationRepository.save(application);
     }
 }

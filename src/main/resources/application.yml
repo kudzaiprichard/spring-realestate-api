@@ -24,3 +24,6 @@ application:
       expiration: 86400000 # 24/7
       refresh-token:
         expiration: 604800000 # 7 days
+  custom:
+    file-storage:
+      image-directory: /path/to/your/image/storage

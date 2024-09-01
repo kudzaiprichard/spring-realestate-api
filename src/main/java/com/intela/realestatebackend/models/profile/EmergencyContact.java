@@ -1,18 +1,16 @@
-package com.intela.realestatebackend.models.application;
+package com.intela.realestatebackend.models.profile;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
-
 @Entity
-@Table(name = "user_references")
+@Table(name = "emergency_contacts")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Reference {
+public class EmergencyContact {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +21,8 @@ public class Reference {
     private String lastName;
     private String relationship;
     private String contactNumber;
-    private String contactEmail;
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
     private CustomerInformation profile;
-
-    @OneToMany(mappedBy = "reference")
-    private Set<ResidentialHistory> residentialHistories;
-
-    @OneToMany(mappedBy = "reference")
-    private Set<EmploymentHistory> employmentHistories;
 }

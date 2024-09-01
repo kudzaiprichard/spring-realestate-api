@@ -1,6 +1,6 @@
 package com.intela.realestatebackend.requestResponse;
 
-import com.intela.realestatebackend.models.application.CustomerInformation;
+import com.intela.realestatebackend.models.property.Application;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -8,5 +8,5 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @AllArgsConstructor
-public class ApplicationRequest extends CustomerInformation {
+public class ApplicationRequest extends Application {
 }

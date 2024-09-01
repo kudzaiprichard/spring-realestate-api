@@ -1,13 +1,12 @@
 package com.intela.realestatebackend.util;
 
-import com.intela.realestatebackend.models.application.CustomerInformation;
+import com.intela.realestatebackend.models.profile.CustomerInformation;
 import com.intela.realestatebackend.models.property.PropertyImage;
 import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
-import com.intela.realestatebackend.requestResponse.FeatureResponse;
 import com.intela.realestatebackend.requestResponse.ImageResponse;
 import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
@@ -159,9 +158,5 @@ public class Util {
         }
 
         throw new IllegalArgumentException("The given field object is not a field of the parent object.");
-    }
-
-    public static boolean isCustomerProfile(CustomerInformation c) {
-        return c.getProperty() == null;
     }
 }

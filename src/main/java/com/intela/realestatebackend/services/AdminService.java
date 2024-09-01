@@ -1,8 +1,8 @@
 package com.intela.realestatebackend.services;
 
 import com.intela.realestatebackend.models.User;
-import com.intela.realestatebackend.models.application.CustomerInformation;
-import com.intela.realestatebackend.repositories.application.CustomerInformationRepository;
+import com.intela.realestatebackend.models.profile.CustomerInformation;
+import com.intela.realestatebackend.repositories.CustomerInformationRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
@@ -27,7 +27,6 @@ public class AdminService {
     public List<RetrieveProfileResponse> listAllProfiles() {
         // Retrieve profiles where property_id is null
         return customerInformationRepository.findAll().stream()
-                .filter(user -> Util.isCustomerProfile(user))
                 .map(user -> mapToRetrieveProfileResponse(user))
                 .collect(Collectors.toList());
     }
@@ -39,7 +38,7 @@ public class AdminService {
 
     public UpdateProfileResponse updateProfile(Integer userId, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
-        CustomerInformation user = customerInformationRepository.findByUserIdAndPropertyIsNull(userId)
+        CustomerInformation user = customerInformationRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
 
         // Update user details based on UpdateProfileRequest
