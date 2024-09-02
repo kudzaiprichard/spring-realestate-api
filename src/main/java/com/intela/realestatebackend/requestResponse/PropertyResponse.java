@@ -11,5 +11,4 @@ import java.util.List;
 @SuperBuilder
 @AllArgsConstructor
 public class PropertyResponse extends Property {
-    private List<String> images;
 }

@@ -2,7 +2,6 @@ package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
-import com.intela.realestatebackend.requestResponse.ImageResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import com.intela.realestatebackend.services.CustomerService;
 import jakarta.servlet.http.HttpServletRequest;

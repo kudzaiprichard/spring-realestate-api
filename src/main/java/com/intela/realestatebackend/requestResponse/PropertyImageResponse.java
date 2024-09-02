@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImageResponse {
+public class PropertyImageResponse {
     private int id;
     private byte[] image;
     private String type;

@@ -22,7 +22,11 @@ public class UserController {
             HttpServletRequest servletRequest,
             @RequestBody UpdateProfileRequest request
     ) {
-        return ResponseEntity.ok().body(userService.updateProfile(servletRequest, request));
+        try {
+            return ResponseEntity.ok().body(userService.updateProfile(servletRequest, request));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("/")
@@ -30,6 +34,6 @@ public class UserController {
             HttpServletRequest servletRequest,
             @RequestBody RetrieveProfileRequest request
     ) {
-        return ResponseEntity.ok().body(userService.retrieveProfile(servletRequest, request));
+        return ResponseEntity.ok().body(userService.retrieveProfile(servletRequest));
     }
 }

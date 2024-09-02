@@ -7,6 +7,7 @@ import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
+import com.intela.realestatebackend.util.Util;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -186,28 +187,11 @@ public class AuthService {
         return response;
     }
 
-    private RetrieveAccountResponse mapToRetrieveAccountResponse(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        RetrieveAccountResponse response = new RetrieveAccountResponse();
-
-        // Assuming RetrieveAccountResponse has the necessary setters and User has the necessary getters
-        response.setId(user.getId()); // or other equivalent field
-        response.setEmail(user.getEmail());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setMobileNumber(user.getMobileNumber());
-        // Map other fields as necessary
-
-        return response;
-    }
     public RetrieveAccountResponse getUserByAccessToken(String accessToken) {
-        return mapToRetrieveAccountResponse(tokenRepository.findUserByAccessToken(accessToken));
+        return Util.mapToRetrieveAccountResponse(tokenRepository.findUserByAccessToken(accessToken));
     }
 
     public RetrieveAccountResponse getUserByRefreshToken(String refreshToken) {
-        return mapToRetrieveAccountResponse(tokenRepository.findUserByRefreshToken(refreshToken));
+        return Util.mapToRetrieveAccountResponse(tokenRepository.findUserByRefreshToken(refreshToken));
     }
 }

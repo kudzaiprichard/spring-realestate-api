@@ -1,8 +1,7 @@
 package com.intela.realestatebackend.controllers;
 
-import com.intela.realestatebackend.requestResponse.ImageResponse;
+import com.intela.realestatebackend.requestResponse.PropertyImageResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
-import com.intela.realestatebackend.services.CustomerService;
 import com.intela.realestatebackend.services.PropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +40,7 @@ public class PropertyController {
     }
 
     @GetMapping("/images/{propertyId}")
-    public ResponseEntity<List<ImageResponse>> fetchAllImagesByPropertyId(@PathVariable Integer propertyId){
+    public ResponseEntity<List<PropertyImageResponse>> fetchAllImagesByPropertyId(@PathVariable Integer propertyId){
         return ResponseEntity.ok(this.propertyService.fetchAllImagesByPropertyId(propertyId));
     }
 }

@@ -12,7 +12,7 @@ import com.intela.realestatebackend.repositories.CustomerInformationRepository;
 import com.intela.realestatebackend.repositories.application.ApplicationRepository;
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
-import com.intela.realestatebackend.requestResponse.ImageResponse;
+import com.intela.realestatebackend.requestResponse.PropertyImageResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,31 +36,6 @@ public class CustomerService {
     private final CustomerInformationRepository customerInformationRepository;
     private final JwtService jwtService;
     private final ApplicationRepository applicationRepository;
-
-    //Todo: Add a search/filter/sorting functionality on fetching all filters
-
-    //should include pagination etc
-    public List<PropertyResponse> fetchAllProperties(Pageable pageRequest){
-        List<PropertyResponse> propertyResponses = new ArrayList<>();
-
-        this.propertyRepository.findAll(pageRequest)
-                .forEach(property -> {
-                    List<String> imageResponses = new ArrayList<>();
-                    property.getPropertyImages().forEach(image1 -> imageResponses.add(image1.getName()));
-                    propertyResponses.add(getPropertyResponse(imageResponses, property, userRepository));
-                });
-
-        return propertyResponses;
-    }
-
-    public PropertyResponse fetchPropertyById(Integer propertyId){
-        return getPropertyById(propertyId, this.propertyRepository, this.userRepository);
-    }
-
-    public List<ImageResponse> fetchAllImagesByPropertyId(int propertyId) {
-        return getImageByPropertyId(propertyId, this.propertyImageRepository);
-    }
-
     public List<PropertyResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest){
         User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
         List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId(), pageRequest);
@@ -190,6 +165,13 @@ public class CustomerService {
             throw new RuntimeException("You are not authorized to access this application");
         }
 
+        ApplicationResponse response = getApplicationResponse(application);
+
+        // Return the ApplicationResponse
+        return response;
+    }
+
+    private static ApplicationResponse getApplicationResponse(Application application) {
         ApplicationResponse response = new ApplicationResponse();
         response.setId(application.getId());
         response.setUser(application.getUser());
@@ -201,8 +183,6 @@ public class CustomerService {
         response.setPersonalDetails(application.getPersonalDetails());
         response.setIds(application.getIds());
         response.setReferences(application.getReferences());
-
-        // Return the ApplicationResponse
         return response;
     }
 
