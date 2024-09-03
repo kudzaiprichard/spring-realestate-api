@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import static com.intela.realestatebackend.models.archetypes.Role.ADMIN;
 import static com.intela.realestatebackend.models.archetypes.Role.CUSTOMER;
-
+// TODO: simplify request response objects to minimize front-end workload
 @SpringBootApplication
 public class RealestateBackendApplication {
 
