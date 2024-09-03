@@ -38,7 +38,7 @@ public class DealerService {
 
 
     //Fetch all properties by user id
-    public List<PropertyResponse> fetchAllPropertiesByUserId(HttpServletRequest request, Pageable pageRequest){
+    public List<PropertyResponse> fetchAllProperties(HttpServletRequest request, Pageable pageRequest){
         User user = getUserByToken(request, jwtService, this.userRepository);
         List<PropertyResponse> propertyResponses = new ArrayList<>();
         
@@ -48,18 +48,6 @@ public class DealerService {
                         });
 
         return propertyResponses;
-    }
-
-    public List<PropertyImageResponse> fetchAllPropertyImagesByUserId(HttpServletRequest request, Pageable pageRequest){
-        User user = getUserByToken(request, jwtService, this.userRepository);
-        List<PropertyImageResponse> responses = new ArrayList<>();
-
-        this.propertyImageRepository.findAllByUserId(user.getId(), pageRequest)
-                .forEach(propertyImage -> {
-                    responses.add(Util.convertFromPropertyImageToImageResponse(propertyImage));
-                });
-
-        return responses;
     }
 
     //Add property

@@ -11,5 +11,4 @@ import java.util.List;
 public interface PropertyImageRepository extends JpaRepository<PropertyImage,Integer> {
     List<PropertyImage> findAllByPropertyId(int propertyId);
 
-    List<PropertyImage> findAllByUserId(Integer id, Pageable pageRequest);
 }

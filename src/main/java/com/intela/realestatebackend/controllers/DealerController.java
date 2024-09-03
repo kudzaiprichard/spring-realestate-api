@@ -61,23 +61,7 @@ public class DealerController {
                 Sort.Direction.ASC,
                 sortBy.orElse("id")
         );
-        return ResponseEntity.ok(this.dealerService.fetchAllPropertiesByUserId(request, pageRequest));
-    }
-
-    @GetMapping("/properties")
-    public ResponseEntity<List<PropertyImageResponse>> fetchAllPropertyImagesByUserId(
-            HttpServletRequest request,
-            @RequestParam Optional<Integer> pageNumber,
-            @RequestParam Optional<String> sortBy,
-            @RequestParam Optional<Integer> amount
-    ) {
-        Pageable pageRequest = PageRequest.of(
-                pageNumber.orElse(0),
-                amount.orElse(20),
-                Sort.Direction.ASC,
-                sortBy.orElse("propertyId")
-        );
-        return ResponseEntity.ok(this.dealerService.fetchAllPropertyImagesByUserId(request, pageRequest));
+        return ResponseEntity.ok(this.dealerService.fetchAllProperties(request, pageRequest));
     }
 
     //Todo: Endpoint should return images as a list
