@@ -9,7 +9,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,19 +38,39 @@ public class Property {
     private Timestamp availableFrom;
     private Timestamp availableTill;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "feature_id")
     private Feature feature;
 
     @OneToMany(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
-            mappedBy = "property"
+            mappedBy = "property",
+            orphanRemoval = true
     )
     @ToString.Exclude
     private List<PropertyImage> propertyImages = new ArrayList<>();
 
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "property",
+            orphanRemoval = true
+    )
+    private Set<Bookmark> bookmarks;
+
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "property",
+            orphanRemoval = true
+    )
+    private Set<Application> applications;
+
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "parentListing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Plan> plans = new HashSet<>();
 }

@@ -20,7 +20,7 @@ public class Bookmark {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "property_id")
     private Property property;
 }

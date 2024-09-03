@@ -2,10 +2,7 @@ package com.intela.realestatebackend.models.property;
 
 import com.intela.realestatebackend.models.profile.ApplicationStatus;
 import com.intela.realestatebackend.models.profile.CustomerInformation;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +19,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @SuperBuilder
 public class Application extends CustomerInformation {
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "property_id")
     private Property property;
 
