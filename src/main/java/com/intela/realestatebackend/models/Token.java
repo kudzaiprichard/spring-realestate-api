@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.archetypes.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,6 +25,7 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
 }

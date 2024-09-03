@@ -1,9 +1,11 @@
 package com.intela.realestatebackend.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.profile.CustomerInformation;
 import com.intela.realestatebackend.models.archetypes.Role;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
+import com.intela.realestatebackend.models.property.Property;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -39,17 +41,31 @@ public class User implements UserDetails{
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Token> tokens;
 
     @OneToMany(
             fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user"
     )
+    @JsonManagedReference
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+    @OneToMany(
+            fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user"
+    )
+    @JsonManagedReference
+    private List<Property> properties = new ArrayList<>();
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private CustomerInformation customerInformation;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private ProfileImage profileImage;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<Application> applications;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

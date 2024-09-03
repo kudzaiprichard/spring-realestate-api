@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.property.Property;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,5 +17,6 @@ public class ProfileImage extends Image {
     @OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @ToString.Exclude
+    @JsonBackReference
     private User user;
 }

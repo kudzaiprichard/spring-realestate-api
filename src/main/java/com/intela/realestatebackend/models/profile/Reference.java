@@ -1,5 +1,7 @@
 package com.intela.realestatebackend.models.profile;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,11 +29,14 @@ public class Reference {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
+    @JsonBackReference
     private CustomerInformation profile;
 
     @OneToMany(mappedBy = "reference")
+    @JsonManagedReference
     private Set<ResidentialHistory> residentialHistories;
 
     @OneToMany(mappedBy = "reference")
+    @JsonManagedReference
     private Set<EmploymentHistory> employmentHistories;
 }
