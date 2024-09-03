@@ -17,7 +17,7 @@ import java.util.Set;
 public class RetrieveAccountResponse extends User {
     @Override
     @JsonIgnore
-    public Set<CustomerInformation> getCustomerInformation() {
+    public CustomerInformation getCustomerInformation() {
         return super.getCustomerInformation();
     }
 }
