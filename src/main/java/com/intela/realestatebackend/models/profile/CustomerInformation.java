@@ -1,10 +1,14 @@
 package com.intela.realestatebackend.models.profile;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
@@ -24,6 +28,7 @@ public class CustomerInformation {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     @JsonBackReference
     private User user;
 

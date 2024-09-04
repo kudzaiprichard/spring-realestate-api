@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models.property;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.User;
@@ -8,6 +9,7 @@ import com.intela.realestatebackend.models.archetypes.PropertyType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ public class Property {
             orphanRemoval = true
     )
     @JsonManagedReference
+    @JsonIgnore
     private Set<Bookmark> bookmarks;
 
     @OneToMany(
@@ -71,10 +74,12 @@ public class Property {
             orphanRemoval = true
     )
     @JsonManagedReference
+    @JsonIgnore
     private Set<Application> applications;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     @JsonBackReference
     private User user;
 

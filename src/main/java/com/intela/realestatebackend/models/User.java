@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.profile.CustomerInformation;
 import com.intela.realestatebackend.models.archetypes.Role;
@@ -48,16 +49,19 @@ public class User implements UserDetails{
             fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user"
     )
     @JsonManagedReference
+    @JsonIgnore
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(
             fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user"
     )
     @JsonManagedReference
+    @JsonIgnore
     private List<Property> properties = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    @JsonIgnore
     private CustomerInformation customerInformation;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,6 +70,7 @@ public class User implements UserDetails{
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    @JsonIgnore
     private Set<Application> applications;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

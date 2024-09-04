@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models.profile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class Reference {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
+    @JsonIgnore
     @JsonBackReference
     private CustomerInformation profile;
 

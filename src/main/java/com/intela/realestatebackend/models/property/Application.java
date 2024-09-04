@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models.property;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.profile.ApplicationStatus;
 import com.intela.realestatebackend.models.profile.CustomerInformation;
@@ -22,6 +23,7 @@ import java.sql.Date;
 public class Application extends CustomerInformation {
     @ManyToOne
     @JoinColumn(name = "property_id")
+    @JsonIgnore
     @JsonBackReference
     private Property property;
 

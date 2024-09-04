@@ -22,24 +22,4 @@ public class RetrieveAccountResponse extends User {
     public RetrieveAccountResponse (User user){
         BeanUtils.copyProperties(user, this);
     }
-    @Override
-    @JsonIgnore
-    public CustomerInformation getCustomerInformation() {
-        return super.getCustomerInformation();
-    }
-    @Override
-    @JsonIgnore
-    public List<Bookmark> getBookmarks() {
-        return super.getBookmarks();
-    }
-    @Override
-    @JsonIgnore
-    public List<Property> getProperties() {
-        return super.getProperties();
-    }
-    @Override
-    @JsonIgnore
-    public Set<Application> getApplications() {
-        return super.getApplications();
-    }
 }

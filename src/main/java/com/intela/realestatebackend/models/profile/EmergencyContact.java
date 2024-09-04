@@ -1,6 +1,7 @@
 package com.intela.realestatebackend.models.profile;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,7 @@ public class EmergencyContact {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
+    @JsonIgnore
     @JsonBackReference
     private CustomerInformation profile;
 }

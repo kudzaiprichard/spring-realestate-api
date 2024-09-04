@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models.property;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.Image;
 import jakarta.persistence.*;
@@ -17,6 +18,7 @@ public class PropertyImage extends Image {
     @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id")
     @ToString.Exclude
+    @JsonIgnore
     @JsonBackReference
     private Property property;
 }
