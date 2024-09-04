@@ -1,19 +1,24 @@
 package com.intela.realestatebackend.services;
 
+import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.CustomerInformation;
 import com.intela.realestatebackend.repositories.CustomerInformationRepository;
+import com.intela.realestatebackend.repositories.ProfileImageRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
+import static com.intela.realestatebackend.util.Util.saveImageToDisk;
 
 @Service
 public class UserService {
@@ -21,6 +26,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private CustomerInformationRepository customerInformationRepository;
+    @Autowired
+    private ProfileImageRepository profileImageRepository;
     @Autowired
     private JwtService jwtService;
     public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, UpdateProfileRequest request) throws IllegalAccessException {
@@ -57,5 +64,22 @@ public class UserService {
         CustomerInformation customerInformation = customerInformationRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
         return new RetrieveProfileResponse(customerInformation);
+    }
+
+    public ProfileImageResponse getProfileImage(HttpServletRequest servletRequest) {
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        ProfileImage image = profileImageRepository.findByUserId(user.getId());
+        return new ProfileImageResponse(image);
+    }
+
+    public void updateProfileImage(HttpServletRequest servletRequest, MultipartFile image) throws IOException {
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        ProfileImage profileImage = new ProfileImage();
+        profileImage.setUser(user);
+        profileImage.setImage(image.getBytes());
+        profileImage.setName(image.getOriginalFilename());
+        profileImage.setType(image.getContentType());
+        saveImageToDisk(profileImage);
+        profileImageRepository.save(profileImage);
     }
 }

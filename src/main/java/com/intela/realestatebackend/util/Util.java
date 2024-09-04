@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.util;
 
+import com.intela.realestatebackend.models.Image;
 import com.intela.realestatebackend.models.profile.CustomerInformation;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.PropertyImage;
@@ -235,12 +236,6 @@ public class Util {
             updatedFields.put(getQualifiedFieldName(user, user.getEmail()), request.getEmail());
         }
 
-        // Update role if changed
-        if (!Objects.equals(user.getRole(), request.getRole())) {
-            user.setRole(request.getRole());
-            updatedFields.put(getQualifiedFieldName(user, user.getRole()), request.getRole());
-        }
-
         // Add additional fields as needed
         // For example:
         // updateField(user, request, "anotherField", updatedFields);
@@ -258,6 +253,7 @@ public class Util {
                                 .type(imageRequest.getContentType())
                                 .property(null)
                                 .build();
+                        saveImageToDisk(propertyImage);
                         propertyImages.add(propertyImageRepository.save(propertyImage));
                     } catch (IOException e) {
                         throw new RuntimeException("Could not save image: " + e);
@@ -268,5 +264,8 @@ public class Util {
 
     public static ApplicationResponse mapApplicationToApplicationResponse(Application application) {
         return new ApplicationResponse(application);
+    }
+    public static void saveImageToDisk(Image image){
+
     }
 }

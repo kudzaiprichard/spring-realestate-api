@@ -1,17 +1,18 @@
 package com.intela.realestatebackend.requestResponse;
 
 import com.intela.realestatebackend.models.User;
+import com.intela.realestatebackend.models.archetypes.Role;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@SuperBuilder
+@Builder
 @AllArgsConstructor
-public class UpdateAccountRequest extends User {
+public class UpdateAccountRequest {
     private String firstName;
     private String lastName;
     private String mobileNumber;
