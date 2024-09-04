@@ -2,6 +2,7 @@ package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
+import com.intela.realestatebackend.requestResponse.BookmarkResponse;
 import com.intela.realestatebackend.requestResponse.PropertyResponse;
 import com.intela.realestatebackend.services.CustomerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class CustomerController {
         return ResponseEntity.ok("Bookmark successfully removed");
     }
     @GetMapping("/bookmarks")
-    public ResponseEntity<List<PropertyResponse>> fetchAllBookmarksByUserId(
+    public ResponseEntity<List<BookmarkResponse>> fetchAllBookmarksByUserId(
             HttpServletRequest servletRequest,
             @RequestParam Optional<Integer> pageNumber,
             @RequestParam Optional<String> sortBy,
@@ -48,7 +49,7 @@ public class CustomerController {
         return ResponseEntity.ok(this.customerService.fetchAllBookmarksByUserId(servletRequest, pageRequest));
     }
     @GetMapping("/bookmarks/{bookmarkId}")
-    public ResponseEntity<PropertyResponse> fetchBookmarkById(@PathVariable Integer bookmarkId, HttpServletRequest servletRequest){
+    public ResponseEntity<BookmarkResponse> fetchBookmarkById(@PathVariable Integer bookmarkId, HttpServletRequest servletRequest){
         return ResponseEntity.ok(this.customerService.fetchBookmarkById(bookmarkId, servletRequest));
     }
     @PostMapping("/applications/create/{propertyId}")

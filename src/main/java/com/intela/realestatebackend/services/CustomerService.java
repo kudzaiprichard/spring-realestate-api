@@ -10,10 +10,7 @@ import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.repositories.CustomerInformationRepository;
 import com.intela.realestatebackend.repositories.application.ApplicationRepository;
-import com.intela.realestatebackend.requestResponse.ApplicationRequest;
-import com.intela.realestatebackend.requestResponse.ApplicationResponse;
-import com.intela.realestatebackend.requestResponse.PropertyImageResponse;
-import com.intela.realestatebackend.requestResponse.PropertyResponse;
+import com.intela.realestatebackend.requestResponse.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,29 +33,22 @@ public class CustomerService {
     private final CustomerInformationRepository customerInformationRepository;
     private final JwtService jwtService;
     private final ApplicationRepository applicationRepository;
-    public List<PropertyResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest){
+    public List<BookmarkResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest){
         User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
         List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId(), pageRequest);
-        List<PropertyResponse> bookmarkResponses = new ArrayList<>();
+        List<BookmarkResponse> bookmarkResponses = new ArrayList<>();
 
-        bookmarks.forEach(bookmark -> bookmarkResponses.add(
-                getPropertyById(
-                        bookmark.getProperty().getId(),
-                        this.propertyRepository,
-                        this.userRepository
-                    )
-                )
-        );
+        bookmarks.forEach(BookmarkResponse::new);
 
         return bookmarkResponses;
     }
 
-    public PropertyResponse fetchBookmarkById(Integer bookmarkId, HttpServletRequest servletRequest){
+    public BookmarkResponse fetchBookmarkById(Integer bookmarkId, HttpServletRequest servletRequest){
         User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
         Bookmark bookmark = this.bookmarkRepository.findById(bookmarkId)
             .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
         if (bookmark.getUser().getId() == loggedUser.getId())
-            return getPropertyById(bookmark.getProperty().getId(), this.propertyRepository, userRepository);
+            return new BookmarkResponse(bookmark);
         else
             return null;
     }
@@ -132,21 +122,7 @@ public class CustomerService {
         // Filter out entries where property is null
         List<ApplicationResponse> applicationResponses = applications.stream()
                 .filter(info -> info.getProperty() != null)
-                .map(info -> {
-                    // Convert CustomerInformation to ApplicationResponse
-                    ApplicationResponse response = new ApplicationResponse();
-                    response.setId(info.getId());
-                    response.setUser(info.getUser());
-                    response.setProperty(info.getProperty());
-                    response.setContactDetails(info.getContactDetails());
-                    response.setEmergencyContacts(info.getEmergencyContacts());
-                    response.setResidentialHistories(info.getResidentialHistories());
-                    response.setEmploymentHistories(info.getEmploymentHistories());
-                    response.setPersonalDetails(info.getPersonalDetails());
-                    response.setIds(info.getIds());
-                    response.setReferences(info.getReferences());
-                    return response;
-                })
+                .map(ApplicationResponse::new)
                 .collect(Collectors.toList());
 
         return applicationResponses;
@@ -165,24 +141,9 @@ public class CustomerService {
             throw new RuntimeException("You are not authorized to access this application");
         }
 
-        ApplicationResponse response = getApplicationResponse(application);
+        ApplicationResponse response = mapApplicationToApplicationResponse(application);
 
         // Return the ApplicationResponse
-        return response;
-    }
-
-    private static ApplicationResponse getApplicationResponse(Application application) {
-        ApplicationResponse response = new ApplicationResponse();
-        response.setId(application.getId());
-        response.setUser(application.getUser());
-        response.setProperty(application.getProperty());
-        response.setContactDetails(application.getContactDetails());
-        response.setEmergencyContacts(application.getEmergencyContacts());
-        response.setResidentialHistories(application.getResidentialHistories());
-        response.setEmploymentHistories(application.getEmploymentHistories());
-        response.setPersonalDetails(application.getPersonalDetails());
-        response.setIds(application.getIds());
-        response.setReferences(application.getReferences());
         return response;
     }
 

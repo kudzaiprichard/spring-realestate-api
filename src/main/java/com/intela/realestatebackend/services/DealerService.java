@@ -221,7 +221,7 @@ public class DealerService {
 
         // Step 3: Convert the list of Plan entities to PlanResponse DTOs
         return plans.stream()
-                .map(plan -> (PlanResponse) plan)
+                .map(PlanResponse::new)
                 .collect(Collectors.toList());
     }
 
@@ -235,7 +235,7 @@ public class DealerService {
         if (application == null) {
             return null;
         }
-        return (ApplicationResponse) application;
+        return new ApplicationResponse(application);
     }
 
     public List<ApplicationResponse> listAllApplicationsByPropertyId(Integer propertyId) {

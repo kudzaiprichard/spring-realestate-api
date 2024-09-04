@@ -56,6 +56,6 @@ public class UserService {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         CustomerInformation customerInformation = customerInformationRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
-        return (RetrieveProfileResponse) customerInformation;
+        return new RetrieveProfileResponse(customerInformation);
     }
 }

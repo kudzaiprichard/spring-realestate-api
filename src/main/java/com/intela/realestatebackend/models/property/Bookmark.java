@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Entity(name = "bookmarks")
 public class Bookmark {
     @Id

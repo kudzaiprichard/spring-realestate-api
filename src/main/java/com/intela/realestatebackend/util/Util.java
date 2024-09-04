@@ -1,6 +1,7 @@
 package com.intela.realestatebackend.util;
 
 import com.intela.realestatebackend.models.profile.CustomerInformation;
+import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.PropertyImage;
 import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
@@ -85,7 +86,7 @@ public class Util {
 
     public static PropertyResponse getPropertyResponse(Property property,
                                                        UserRepository userRepository) {
-        return (PropertyResponse) property;
+        return new PropertyResponse(property);
     }
 
     public static PropertyResponse getPropertyById(Integer propertyId,
@@ -102,21 +103,16 @@ public class Util {
     }
 
     public static List<PropertyImageResponse> getImageByPropertyId(int propertyId, PropertyImageRepository propertyImageRepository) {
-        List<PropertyImageResponse> propertyImageRespons = new ArrayList<>();
+        List<PropertyImageResponse> propertyImageResponses = new ArrayList<>();
         List<PropertyImage> propertyImages = propertyImageRepository.findAllByPropertyId(propertyId);
 
         propertyImages.forEach(
-                propertyImage -> propertyImageRespons.add(
-                        PropertyImageResponse.builder()
-                                .id(propertyImage.getId())
-                                .type(propertyImage.getType())
-                                .name(propertyImage.getName())
-                                .image(decompressImage(propertyImage.getImage()))
-                                .build()
+                propertyImage -> propertyImageResponses.add(
+                        new PropertyImageResponse(propertyImage)
                 )
         );
 
-        return propertyImageRespons;
+        return propertyImageResponses;
     }
 
     public static String getQualifiedFieldName(Object parentObject, Object fieldObject) throws IllegalAccessException {
@@ -137,19 +133,12 @@ public class Util {
         if (propertyImage == null || propertyImage.getImage() == null) {
             return null;
         }
-        PropertyImageResponse propertyImageResponse = new PropertyImageResponse();
-        propertyImageResponse.setId(propertyImage.getId());
-        propertyImageResponse.setImage(propertyImage.getImage());
-        propertyImageResponse.setName(propertyImage.getName());
-        propertyImageResponse.setType(propertyImage.getType());
-        propertyImageResponse.setPropertyId(propertyImage.getProperty().getId());
-
-        return propertyImageResponse;
+        return new PropertyImageResponse(propertyImage);
     }
 
     public static RetrieveProfileResponse mapToRetrieveProfileResponse(CustomerInformation user) {
         // Implement mapping logic here
-        return (RetrieveProfileResponse) user;
+        return new RetrieveProfileResponse(user);
     }
 
     public static UpdateProfileResponse mapToUpdateProfileResponse(CustomerInformation user, Map<String, Object> updatedFields) {
@@ -161,7 +150,7 @@ public class Util {
 
     public static RetrieveAccountResponse mapToRetrieveAccountResponse(User user) {
         // Implement mapping logic here
-        return (RetrieveAccountResponse) user;
+        return new RetrieveAccountResponse(user);
     }
 
     public static UpdateAccountResponse mapToUpdateAccountResponse(User user, Map<String, Object> updatedFields) {
@@ -275,5 +264,9 @@ public class Util {
                     }
                 }
         );
+    }
+
+    public static ApplicationResponse mapApplicationToApplicationResponse(Application application) {
+        return new ApplicationResponse(application);
     }
 }

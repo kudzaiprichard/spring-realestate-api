@@ -24,14 +24,14 @@ public class PropertyService {
     public List<PropertyResponse> fetchAllProperties(Pageable pageRequest) {
         Page<Property> properties = propertyRepository.findAll(pageRequest);
         return properties.stream()
-                .map(property -> (PropertyResponse) property) // Assuming PropertyResponse has a constructor that takes a Property
+                .map(PropertyResponse::new) // Assuming PropertyResponse has a constructor that takes a Property
                 .collect(Collectors.toList());
     }
 
     public PropertyResponse fetchPropertyById(Integer propertyId) {
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new IllegalArgumentException("Property not found with id: " + propertyId));
-        return (PropertyResponse) property;
+        return new PropertyResponse(property);
     }
 
     public List<PropertyImageResponse> fetchAllImagesByPropertyId(Integer propertyId) {
