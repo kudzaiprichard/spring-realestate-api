@@ -21,6 +21,7 @@ public class PropertyService {
     private PropertyRepository propertyRepository;
     @Autowired
     private PropertyImageRepository propertyImageRepository;
+
     public List<PropertyResponse> fetchAllProperties(Pageable pageRequest) {
         Page<Property> properties = propertyRepository.findAll(pageRequest);
         return properties.stream()

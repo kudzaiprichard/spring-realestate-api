@@ -18,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
+
     @GetMapping("/")
     public ResponseEntity<List<PropertyResponse>> fetchAllProperties(
             @RequestParam Optional<Integer> pageNumber,
@@ -35,12 +36,12 @@ public class PropertyController {
     }
 
     @GetMapping("/{propertyId}")
-    public ResponseEntity<PropertyResponse> fetchPropertyById(@PathVariable Integer propertyId){
+    public ResponseEntity<PropertyResponse> fetchPropertyById(@PathVariable Integer propertyId) {
         return ResponseEntity.ok(this.propertyService.fetchPropertyById(propertyId));
     }
 
     @GetMapping("/images/{propertyId}")
-    public ResponseEntity<List<PropertyImageResponse>> fetchAllImagesByPropertyId(@PathVariable Integer propertyId){
+    public ResponseEntity<List<PropertyImageResponse>> fetchAllImagesByPropertyId(@PathVariable Integer propertyId) {
         return ResponseEntity.ok(this.propertyService.fetchAllImagesByPropertyId(propertyId));
     }
 }

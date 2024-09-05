@@ -1,8 +1,6 @@
 package com.intela.realestatebackend.controllers;
 
-import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.requestResponse.*;
-import com.intela.realestatebackend.services.AuthService;
 import com.intela.realestatebackend.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +19,11 @@ public class UserController {
     @PostMapping("/profile")
     public ResponseEntity<UpdateProfileResponse> updateProfile(
             HttpServletRequest servletRequest,
-            @RequestBody UpdateProfileRequest request
+            @RequestPart("images") MultipartFile[] images,
+            @RequestPart("profileJsonData") UpdateProfileRequest request
     ) {
         try {
-            return ResponseEntity.ok().body(userService.updateProfile(servletRequest, request));
+            return ResponseEntity.ok().body(userService.updateProfile(servletRequest, images, request));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -56,6 +55,7 @@ public class UserController {
     ) {
         return ResponseEntity.ok().body(userService.retrieveProfile(servletRequest));
     }
+
     @PostMapping("/")
     public ResponseEntity<UpdateAccountResponse> updateAccount(
             HttpServletRequest servletRequest,

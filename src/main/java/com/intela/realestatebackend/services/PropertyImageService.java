@@ -1,6 +1,5 @@
 package com.intela.realestatebackend.services;
 
-import com.intela.realestatebackend.models.Image;
 import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.property.PropertyImage;
 import com.intela.realestatebackend.repositories.PropertyImageRepository;
@@ -26,7 +25,7 @@ public class PropertyImageService {
 
     public PropertyImage storePropertyImage(MultipartFile file, Property property) throws IOException {
         // Step 1: Save the image file to the filesystem or database
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(imageStorageDirectory, fileName);
         Files.write(filePath, file.getBytes());
 
@@ -39,6 +38,6 @@ public class PropertyImageService {
         image.setProperty(property);
 
         // Step 4: Save the PropertyImage entity
-        return  propertyImageRepository.save(image);
+        return propertyImageRepository.save(image);
     }
 }

@@ -1,16 +1,23 @@
 package com.intela.realestatebackend.util;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.Image;
-import com.intela.realestatebackend.models.profile.CustomerInformation;
-import com.intela.realestatebackend.models.property.Application;
-import com.intela.realestatebackend.models.property.PropertyImage;
-import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.User;
+import com.intela.realestatebackend.models.profile.ID;
+import com.intela.realestatebackend.models.profile.Profile;
+import com.intela.realestatebackend.models.property.Application;
+import com.intela.realestatebackend.models.property.Property;
+import com.intela.realestatebackend.models.property.PropertyImage;
+import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.JwtService;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +40,7 @@ public class Util {
         final String userEmail;
         final String jwtToken;
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new RuntimeException("Please enter a valid token");
         }
 
@@ -44,63 +51,58 @@ public class Util {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public static byte[] compressImage(byte[] image){
+    public static byte[] compressImage(byte[] image) {
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);
         deflater.setInput(image);
         deflater.finish();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(image.length);
-        byte[] tmp = new byte[4*1024];
+        byte[] tmp = new byte[4 * 1024];
 
-        while(!deflater.finished()){
+        while (!deflater.finished()) {
             int size = deflater.deflate(tmp);
             outputStream.write(tmp, 0, size);
         }
 
-        try{
+        try {
             outputStream.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException("Can't compress image");
         }
         return outputStream.toByteArray();
     }
 
-    public static byte[] decompressImage(byte[] image){
+    public static byte[] decompressImage(byte[] image) {
         Inflater inflater = new Inflater();
         inflater.setInput(image);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        byte[] tmp = new byte[4*1024];
+        byte[] tmp = new byte[4 * 1024];
 
-        try{
-            while(!inflater.finished()){
+        try {
+            while (!inflater.finished()) {
                 int count = inflater.inflate(tmp);
                 outputStream.write(tmp, 0, count);
             }
             outputStream.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Can't decompress image");
         }
         return outputStream.toByteArray();
     }
 
-    public static PropertyResponse getPropertyResponse(Property property,
-                                                       UserRepository userRepository) {
+    public static PropertyResponse getPropertyResponse(Property property) {
         return new PropertyResponse(property);
     }
 
     public static PropertyResponse getPropertyById(Integer propertyId,
-                                                   PropertyRepository propertyRepository,
-                                                   UserRepository userRepository) {
+                                                   PropertyRepository propertyRepository) {
 
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(()-> new EntityNotFoundException("Property not found"));
-        List<String> imageResponses = new ArrayList<>();
+                .orElseThrow(() -> new EntityNotFoundException("Property not found"));
 
-        property.getPropertyImages().forEach(propertyImage1 -> imageResponses.add(propertyImage1.getName()));
-
-        return getPropertyResponse(property, userRepository);
+        return getPropertyResponse(property);
     }
 
     public static List<PropertyImageResponse> getImageByPropertyId(int propertyId, PropertyImageRepository propertyImageRepository) {
@@ -137,12 +139,12 @@ public class Util {
         return new PropertyImageResponse(propertyImage);
     }
 
-    public static RetrieveProfileResponse mapToRetrieveProfileResponse(CustomerInformation user) {
+    public static RetrieveProfileResponse mapToRetrieveProfileResponse(Profile user) {
         // Implement mapping logic here
         return new RetrieveProfileResponse(user);
     }
 
-    public static UpdateProfileResponse mapToUpdateProfileResponse(CustomerInformation user, Map<String, Object> updatedFields) {
+    public static UpdateProfileResponse mapToUpdateProfileResponse(Map<String, Object> updatedFields) {
         // Implement mapping logic here
         UpdateProfileResponse response = new UpdateProfileResponse();
         response.setUpdatedFields(updatedFields);
@@ -154,13 +156,13 @@ public class Util {
         return new RetrieveAccountResponse(user);
     }
 
-    public static UpdateAccountResponse mapToUpdateAccountResponse(User user, Map<String, Object> updatedFields) {
+    public static UpdateAccountResponse mapToUpdateAccountResponse(Map<String, Object> updatedFields) {
         UpdateAccountResponse response = new UpdateAccountResponse();
         response.setUpdatedFields(updatedFields);
         return response;
     }
 
-    public static Map<String, Object> updateProfileFromRequest(CustomerInformation existingInfo, UpdateProfileRequest request) throws IllegalAccessException {
+    public static Map<String, Object> updateProfileFromRequest(Profile existingInfo, UpdateProfileRequest request) throws IllegalAccessException {
         Map<String, Object> updatedFields = new HashMap<>();
 
         // Update ContactDetails if changed
@@ -243,7 +245,36 @@ public class Util {
         return updatedFields;
     }
 
-    public static void multipartFileToImageList(PropertyImageRepository propertyImageRepository, MultipartFile[] imagesRequest, List<PropertyImage> propertyImages) {
+    public static void multipartFileToIDList(Integer userId,
+                                             ProfileRepository profileRepository,
+                                             IDRepository idRepository,
+                                             MultipartFile[] imagesRequest,
+                                             Set<ID> ids) {
+        Arrays.asList(imagesRequest).forEach(
+                imageRequest -> {
+                    try {
+                        ID id = ID.builder()
+                                .image(compressImage(imageRequest.getBytes()))
+                                .name(imageRequest.getOriginalFilename())
+                                .type(imageRequest.getContentType())
+                                .profile(profileRepository.findByProfileOwnerId(userId)
+                                        .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user")))
+                                .build();
+                        saveImageToDisk(id);
+                        ids.add(idRepository.save(id));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Could not save image: " + e);
+                    }
+                }
+        );
+    }
+
+    public static void multipartFileToPropertyImageList(
+            Integer propertyId,
+            PropertyRepository propertyRepository,
+            PropertyImageRepository propertyImageRepository,
+            MultipartFile[] imagesRequest,
+            List<PropertyImage> propertyImages) {
         Arrays.asList(imagesRequest).forEach(
                 imageRequest -> {
                     try {
@@ -251,7 +282,7 @@ public class Util {
                                 .image(compressImage(imageRequest.getBytes()))
                                 .name(imageRequest.getOriginalFilename())
                                 .type(imageRequest.getContentType())
-                                .property(null)
+                                .property(propertyRepository.findById(propertyId).orElseThrow(() -> new RuntimeException("Property not found")))
                                 .build();
                         saveImageToDisk(propertyImage);
                         propertyImages.add(propertyImageRepository.save(propertyImage));
@@ -265,7 +296,108 @@ public class Util {
     public static ApplicationResponse mapApplicationToApplicationResponse(Application application) {
         return new ApplicationResponse(application);
     }
-    public static void saveImageToDisk(Image image){
 
+    public static void saveImageToDisk(Image image) {
+
+    }
+
+    /**
+     * Recursively searches through an entity and its child entities, merging every detached child entity.
+     * Uses reflection to find fields that represent child entities, guided by @JsonManagedReference and @JsonBackReference.
+     * If neither annotation is present, it assumes the field is a child if it's an @Entity or a collection of @Entity.
+     *
+     * @param <T>           The type of the root entity.
+     * @param entityManager The EntityManager to manage the persistence context.
+     * @param entity        The root entity.
+     * @return The merged root entity.
+     */
+    public static <T> T recursiveMerge(EntityManager entityManager, T entity) {
+        // Perform BFS using a queue to traverse the entity tree
+        Queue<Object> queue = new LinkedList<>();
+        queue.add(entity);
+
+        while (!queue.isEmpty()) {
+            Object currentEntity = queue.poll();
+
+            // Check if the current entity is detached, and merge if necessary
+            if (!entityManager.contains(currentEntity)) {
+                currentEntity = entityManager.merge(currentEntity);  // Reattach the entity
+            }
+
+            // Find and add child entities to the queue
+            List<Object> childEntities = findChildEntities(currentEntity);
+            if (childEntities != null) {
+                queue.addAll(childEntities);
+            }
+        }
+
+        return entity; // Return the root entity (now attached)
+    }
+
+    /**
+     * Uses reflection to find child entities in the given entity.
+     * It looks for fields that are either @JsonManagedReference (indicating children),
+     * or @Entity-annotated types, or collections of @Entity-annotated types.
+     * <p>
+     * Fields with @JsonBackReference (indicating parents) are ignored to prevent recursion.
+     *
+     * @param entity The parent entity.
+     * @return List of child entities or an empty list if no children are found.
+     */
+    public static List<Object> findChildEntities(Object entity) {
+        List<Object> childEntities = new LinkedList<>();
+
+        // Get all fields of the entity
+        Field[] fields = entity.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            try {
+                // Ignore fields annotated with @JsonBackReference (they indicate parent relations)
+                if (field.isAnnotationPresent(JsonBackReference.class)) {
+                    continue;
+                }
+
+                Object fieldValue = field.get(entity);
+
+                if (fieldValue != null) {
+                    // If the field is annotated with @JsonManagedReference (child relation)
+                    if (field.isAnnotationPresent(JsonManagedReference.class)) {
+                        childEntities.add(fieldValue);
+                    }
+
+                    // If the field itself is an entity (child entity)
+                    else if (isEntity(field.getType())) {
+                        childEntities.add(fieldValue);
+                    }
+
+                    // If the field is a collection (e.g., List or Set) of entities
+                    else if (Collection.class.isAssignableFrom(field.getType())) {
+                        Collection<?> collection = (Collection<?>) fieldValue;
+
+                        for (Object item : collection) {
+                            if (isEntity(item.getClass())) {
+                                childEntities.add(item);
+                            }
+                        }
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();  // Handle the exception as necessary
+            }
+        }
+
+        return childEntities;
+    }
+
+    /**
+     * Checks if the given class is annotated with @Entity.
+     *
+     * @param clazz The class to check.
+     * @return true if the class is annotated with @Entity, false otherwise.
+     */
+    public static boolean isEntity(Class<?> clazz) {
+        return clazz.isAnnotationPresent(Entity.class);
     }
 }

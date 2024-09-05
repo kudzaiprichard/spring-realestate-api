@@ -139,7 +139,7 @@ public class DealerController {
     }
 
     @GetMapping("/property/plans/{propertyId}")
-    public ResponseEntity<List<PlanResponse>> listPlansOfProperty(@PathVariable Integer propertyId) {
+    public ResponseEntity<List<PropertyResponse>> listPlansOfProperty(@PathVariable Integer propertyId) {
         return ResponseEntity.created(URI.create("")).body(
                 dealerService.listPlansOfProperty(
                         propertyId
@@ -158,6 +158,13 @@ public class DealerController {
     public ResponseEntity<List<ApplicationResponse>> listAllApplicationsByPropertyId(@PathVariable Integer propertyId) {
         return ResponseEntity.created(URI.create("")).body(
                 dealerService.listAllApplicationsByPropertyId(propertyId)
+        );
+    }
+
+    @GetMapping("/applications/{applicationId}")
+    public ResponseEntity<ApplicationResponse> viewApplication(@PathVariable Integer applicationId) {
+        return ResponseEntity.created(URI.create("")).body(
+                dealerService.viewApplication(applicationId)
         );
     }
 

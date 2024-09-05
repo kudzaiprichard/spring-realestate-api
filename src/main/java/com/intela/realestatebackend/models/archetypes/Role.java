@@ -26,7 +26,7 @@ public enum Role {
                     CUSTOMER_UPDATE,
                     CUSTOMER_DELETE,
                     CUSTOMER_READ
-                    )
+            )
     ),
     DEALER(
             Set.of(

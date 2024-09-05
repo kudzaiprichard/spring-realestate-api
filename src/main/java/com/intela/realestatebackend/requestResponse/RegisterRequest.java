@@ -1,7 +1,10 @@
 package com.intela.realestatebackend.requestResponse;
 
 import com.intela.realestatebackend.models.archetypes.Role;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder

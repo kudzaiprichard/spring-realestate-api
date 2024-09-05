@@ -1,17 +1,23 @@
 package com.intela.realestatebackend.services;
 
 import com.intela.realestatebackend.models.User;
-import com.intela.realestatebackend.models.profile.CustomerInformation;
-import com.intela.realestatebackend.repositories.CustomerInformationRepository;
+import com.intela.realestatebackend.models.profile.ID;
+import com.intela.realestatebackend.models.profile.Profile;
+import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,11 +28,13 @@ public class AdminService {
     private UserRepository userRepository;
 
     @Autowired
-    private CustomerInformationRepository customerInformationRepository;
+    private ProfileRepository profileRepository;
+    @Autowired
+    private IDRepository idRepository;
 
     public List<RetrieveProfileResponse> listAllProfiles() {
         // Retrieve profiles where property_id is null
-        return customerInformationRepository.findAll().stream()
+        return profileRepository.findAll().stream()
                 .map(user -> Util.mapToRetrieveProfileResponse(user))
                 .collect(Collectors.toList());
     }
@@ -36,19 +44,21 @@ public class AdminService {
         userRepository.deleteById(userId);
     }
 
-    public UpdateProfileResponse updateProfile(Integer userId, UpdateProfileRequest request) throws IllegalAccessException {
+    public UpdateProfileResponse updateProfile(Integer userId, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
-        CustomerInformation user = customerInformationRepository.findByUserId(userId)
+        Profile user = profileRepository.findByProfileOwnerId(userId)
                 .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
+        Set<ID> ids = new HashSet<>();
+        Util.multipartFileToIDList(userId, profileRepository, idRepository, images, ids);
 
         // Update user details based on UpdateProfileRequest
+        user.setIds(ids);
         Map<String, Object> updatedFields = Util.updateProfileFromRequest(user, request);
-
         // Save the updated user
-        customerInformationRepository.save(user);
+        profileRepository.save(user);
 
         // Return the updated profile response
-        return Util.mapToUpdateProfileResponse(user, updatedFields);
+        return Util.mapToUpdateProfileResponse(updatedFields);
     }
 
     public UpdateAccountResponse updateAccount(Integer userId, UpdateAccountRequest request) throws IllegalAccessException {
@@ -63,7 +73,7 @@ public class AdminService {
         userRepository.save(user);
 
         // Return the updated profile response
-        return Util.mapToUpdateAccountResponse(user, updatedFields);
+        return Util.mapToUpdateAccountResponse(updatedFields);
     }
 
     public List<RetrieveAccountResponse> listAllAccounts() {

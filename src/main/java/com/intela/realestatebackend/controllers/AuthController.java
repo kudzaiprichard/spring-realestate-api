@@ -1,6 +1,5 @@
 package com.intela.realestatebackend.controllers;
 
-import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +45,7 @@ public class AuthController {
         return ResponseEntity.accepted()
                 .body(authService.resetPassword(servletRequest, request));
     }
+
     /*
     Manage access and refresh tokens
         In this case, the flow is the following one:

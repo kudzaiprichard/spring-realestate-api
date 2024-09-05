@@ -13,10 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.intela.realestatebackend.models.archetypes.Permission.*;
 import static com.intela.realestatebackend.models.archetypes.Role.*;
-import static org.springframework.http.HttpMethod.*;
-import static org.springframework.http.HttpMethod.DELETE;
 
 @Configuration
 @EnableWebSecurity
@@ -38,23 +35,16 @@ public class SecurityConfig {
                         .permitAll()
                         //ADMIN ENDPOINTS
                         .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name())
-                        .requestMatchers(GET, "/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
-                        .requestMatchers(POST, "/api/v1/admin/**").hasAuthority(ADMIN_CREATE.name())
-                        .requestMatchers(PUT, "/api/v1/admin/**").hasAuthority(ADMIN_UPDATE.name())
-                        .requestMatchers(DELETE, "/api/v1/admin/**").hasAuthority(ADMIN_DELETE.name())
 
                         //CUSTOMER ENDPOINTS
                         .requestMatchers("/api/v1/customer/**").hasAnyRole(CUSTOMER.name(), ADMIN.name())
-                        .requestMatchers(GET, "/api/v1/customer/**").hasAnyAuthority(CUSTOMER_READ.name(), ADMIN_READ.name())
-                        .requestMatchers(POST, "/api/v1/customer/**").hasAnyAuthority(CUSTOMER_CREATE.name(), ADMIN_CREATE.name())
-                        .requestMatchers(PUT, "/api/v1/customer/**").hasAnyAuthority(CUSTOMER_UPDATE.name(), ADMIN_UPDATE.name())
+
+                        .requestMatchers("/api/v1/properties/**").hasAnyRole(CUSTOMER.name(), ADMIN.name())
+
+                        .requestMatchers("/api/v1/user/**").hasAnyRole(CUSTOMER.name(), ADMIN.name())
 
                         //DEALER ENDPOINTS
                         .requestMatchers("/api/v1/dealer/**").hasAnyRole(DEALER.name(), ADMIN.name())
-                        .requestMatchers(GET, "/api/v1/dealer/**").hasAnyAuthority(DEALER_READ.name(), ADMIN_READ.name())
-                        .requestMatchers(POST, "/api/v1/dealer/**").hasAnyAuthority(DEALER_CREATE.name(), ADMIN_CREATE.name())
-                        .requestMatchers(PUT, "/api/v1/dealer/**").hasAnyAuthority(DEALER_UPDATE.name(), ADMIN_UPDATE.name())
-                        .requestMatchers(DELETE, "/api/v1/dealer/**").hasAnyAuthority(DEALER_DELETE.name(), ADMIN_DELETE.name())
 
                         .anyRequest()
                         .authenticated()

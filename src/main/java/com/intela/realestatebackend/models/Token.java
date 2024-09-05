@@ -1,8 +1,9 @@
 package com.intela.realestatebackend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.archetypes.TokenType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ import lombok.*;
 public class Token {
 
     @Id
+    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
     private String token;
@@ -26,8 +28,8 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
-    @JsonBackReference
+    @Schema(hidden = true)
+    @JsonBackReference("user-tokens")
     private User user;
 
 }

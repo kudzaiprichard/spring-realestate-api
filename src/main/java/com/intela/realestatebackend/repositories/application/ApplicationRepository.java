@@ -1,9 +1,9 @@
 package com.intela.realestatebackend.repositories.application;
 
 import com.intela.realestatebackend.models.User;
+import com.intela.realestatebackend.models.property.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.intela.realestatebackend.models.property.Application;
 
 import java.util.List;
 import java.util.Optional;

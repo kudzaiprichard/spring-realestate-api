@@ -10,6 +10,6 @@ public enum PropertyType {
     STUDIO,
     BEDROOM,
     ENSUITE,
-    OTHER;
+    OTHER
 
 }

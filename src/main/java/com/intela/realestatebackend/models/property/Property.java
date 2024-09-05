@@ -1,15 +1,15 @@
 package com.intela.realestatebackend.models.property;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.archetypes.BillType;
 import com.intela.realestatebackend.models.archetypes.PropertyType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import java.util.Set;
 public class Property {
 
     @Id
+    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -35,55 +36,60 @@ public class Property {
     private String location;
     private String description;
     private Integer numberOfRooms;
+    @Enumerated(EnumType.STRING)
     private PropertyType propertyType;
     private String status;
     private Long price;
+    @Enumerated(EnumType.STRING)
     private BillType billType;
     private Timestamp availableFrom;
     private Timestamp availableTill;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "feature_id")
-    @JsonManagedReference
     private Feature feature;
 
     @OneToMany(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             mappedBy = "property",
             orphanRemoval = true
     )
     @ToString.Exclude
-    @JsonManagedReference
+    @JsonManagedReference("property-propertyImages")
     private List<PropertyImage> propertyImages = new ArrayList<>();
 
     @OneToMany(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             mappedBy = "property",
             orphanRemoval = true
     )
-    @JsonManagedReference
-    @JsonIgnore
+    @JsonManagedReference("property-bookmarks")
+    @Schema(hidden = true)
     private Set<Bookmark> bookmarks;
 
     @OneToMany(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             mappedBy = "property",
             orphanRemoval = true
     )
-    @JsonManagedReference
-    @JsonIgnore
+    @JsonManagedReference("property-applications")
+    @Schema(hidden = true)
     private Set<Application> applications;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
-    @JsonBackReference
+    @Schema(hidden = true)
+    @JsonBackReference("user-properties")
     private User user;
 
+    // Self-referencing relationship for parent and child properties
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_listing", referencedColumnName = "id")
+    @Schema(hidden = true)
+    @JsonBackReference("property-plans")
+    private Property parentListing; // Parent property (main property)
+
     @OneToMany(mappedBy = "parentListing", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference("property-plans")
     private Set<Plan> plans = new HashSet<>();
 }

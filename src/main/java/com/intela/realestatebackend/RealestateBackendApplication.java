@@ -6,9 +6,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
 import static com.intela.realestatebackend.models.archetypes.Role.ADMIN;
 import static com.intela.realestatebackend.models.archetypes.Role.CUSTOMER;
-// TODO: simplify request response objects to minimize front-end workload
+//TODO: Fix applications double-saving
 @SpringBootApplication
 public class RealestateBackendApplication {
 
@@ -19,7 +20,7 @@ public class RealestateBackendApplication {
     @Bean
     public CommandLineRunner commandLineRunner(
             AuthService authenticationService
-    ){
+    ) {
         return args -> {
             var admin = RegisterRequest.builder()
                     .firstName("kudzai")

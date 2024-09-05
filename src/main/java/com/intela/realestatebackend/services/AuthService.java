@@ -2,8 +2,8 @@ package com.intela.realestatebackend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.models.Token;
-import com.intela.realestatebackend.models.archetypes.TokenType;
 import com.intela.realestatebackend.models.User;
+import com.intela.realestatebackend.models.archetypes.TokenType;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
@@ -42,11 +43,11 @@ public class AuthService {
         tokenRepository.save(token);
     }
 
-    private void revokeAllUserTokens(User user){
+    private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if(validUserTokens.isEmpty()) return;
+        if (validUserTokens.isEmpty()) return;
 
-        validUserTokens.forEach(token ->{
+        validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
         });
@@ -56,7 +57,9 @@ public class AuthService {
 
     public AuthenticationResponse register(RegisterRequest request) {
         var userEmail = userRepository.findByEmail(request.getEmail());
-        if(userEmail.isPresent()){throw new RuntimeException("User email already exists");}
+        if (userEmail.isPresent()) {
+            throw new RuntimeException("User email already exists");
+        }
 
         var user = User.builder()
                 .firstName(request.getFirstName())
@@ -86,7 +89,7 @@ public class AuthService {
 
     public LoggedUserResponse fetchLoggedInUserByToken(
             HttpServletRequest request
-    ){
+    ) {
         User user = getUserByToken(request, jwtService, this.userRepository);
         return LoggedUserResponse.builder()
                 .firstname(user.getFirstName())
@@ -96,12 +99,12 @@ public class AuthService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(()-> new EntityNotFoundException("User email does not exist"));
+                .orElseThrow(() -> new EntityNotFoundException("User email does not exist"));
 
-        if(passwordEncoder.matches(request.getPassword(), user.getPassword())){
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     request.getEmail(), request.getPassword()
@@ -131,14 +134,14 @@ public class AuthService {
         final String refreshToken;
         final String userEmail;
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
 
         refreshToken = authHeader.split(" ")[1].trim();
         userEmail = jwtService.extractUsername(refreshToken);
 
-        if(userEmail != null){
+        if (userEmail != null) {
             var user = this.userRepository.findByEmail(userEmail)
                     .orElseThrow(() -> new RuntimeException("Please enter valid token"));
 
@@ -146,7 +149,7 @@ public class AuthService {
                     .map(token -> !token.getRevoked() && !token.getExpired() && token.getTokenType().equals(TokenType.REFRESH))
                     .orElse(false);
 
-            if(jwtService.isTokenValid(refreshToken, user) && isTokenValid){
+            if (jwtService.isTokenValid(refreshToken, user) && isTokenValid) {
                 var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken, TokenType.ACCESS);
@@ -157,7 +160,7 @@ public class AuthService {
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
-                new ObjectMapper().writeValue(response.getOutputStream(),authResponse);
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
 
             throw new RuntimeException("Please enter valid refresh token");

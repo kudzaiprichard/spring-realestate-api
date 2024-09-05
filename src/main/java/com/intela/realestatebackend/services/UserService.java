@@ -2,9 +2,9 @@ package com.intela.realestatebackend.services;
 
 import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.models.User;
-import com.intela.realestatebackend.models.profile.CustomerInformation;
-import com.intela.realestatebackend.repositories.CustomerInformationRepository;
+import com.intela.realestatebackend.models.profile.Profile;
 import com.intela.realestatebackend.repositories.ProfileImageRepository;
+import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
 import static com.intela.realestatebackend.util.Util.saveImageToDisk;
@@ -25,24 +24,25 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private CustomerInformationRepository customerInformationRepository;
+    private ProfileRepository profileRepository;
     @Autowired
     private ProfileImageRepository profileImageRepository;
     @Autowired
     private JwtService jwtService;
-    public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, UpdateProfileRequest request) throws IllegalAccessException {
+
+    public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
-        CustomerInformation customerInformation = customerInformationRepository.findByUserId(user.getId())
+        Profile profile = profileRepository.findByProfileOwnerId(user.getId())
                 .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
         // Update user details based on UpdateProfileRequest
-        Map<String, Object> updatedFields = Util.updateProfileFromRequest(customerInformation, request);
+        Map<String, Object> updatedFields = Util.updateProfileFromRequest(profile, request);
 
         // Save the updated user
-        customerInformationRepository.save(customerInformation);
+        profileRepository.save(profile);
 
         // Return the updated profile response
-        return Util.mapToUpdateProfileResponse(customerInformation, updatedFields);
+        return Util.mapToUpdateProfileResponse(updatedFields);
     }
 
     public UpdateAccountResponse updateAccount(HttpServletRequest servletRequest, UpdateAccountRequest request) throws IllegalAccessException {
@@ -56,14 +56,14 @@ public class UserService {
         userRepository.save(user);
 
         // Return the updated profile response
-        return Util.mapToUpdateAccountResponse(user, updatedFields);
+        return Util.mapToUpdateAccountResponse(updatedFields);
     }
 
     public RetrieveProfileResponse retrieveProfile(HttpServletRequest servletRequest) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
-        CustomerInformation customerInformation = customerInformationRepository.findByUserId(user.getId())
+        Profile profile = profileRepository.findByProfileOwnerId(user.getId())
                 .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
-        return new RetrieveProfileResponse(customerInformation);
+        return new RetrieveProfileResponse(profile);
     }
 
     public ProfileImageResponse getProfileImage(HttpServletRequest servletRequest) {

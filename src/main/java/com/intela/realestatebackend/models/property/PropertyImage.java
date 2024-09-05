@@ -1,9 +1,12 @@
 package com.intela.realestatebackend.models.property;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.Image;
-import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -15,10 +18,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Entity(name = "property_images")
 public class PropertyImage extends Image {
-    @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "property_id")
     @ToString.Exclude
-    @JsonIgnore
-    @JsonBackReference
+    @Schema(hidden = true)
+    @JsonBackReference("property-propertyImages")
     private Property property;
 }

@@ -1,21 +1,23 @@
 package com.intela.realestatebackend.requestResponse;
 
-import com.intela.realestatebackend.models.profile.CustomerInformation;
-import jakarta.annotation.PostConstruct;
-import lombok.*;
+import com.intela.realestatebackend.models.profile.Profile;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import org.springframework.beans.BeanUtils;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-public class RetrieveProfileResponse extends CustomerInformation {
+public class RetrieveProfileResponse extends Profile {
     private Integer userId;
-    public RetrieveProfileResponse (CustomerInformation customerInformation){
-        BeanUtils.copyProperties(customerInformation, this);
+
+    public RetrieveProfileResponse(Profile profile) {
+        BeanUtils.copyProperties(profile, this);
+        init();
     }
-    @PostConstruct
+
     private void init() {
-        this.userId = this.getUser() != null ? this.getUser().getId() : null;
+        this.userId = this.getProfileOwner() != null ? this.getProfileOwner().getId() : null;
     }
 }

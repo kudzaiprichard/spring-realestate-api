@@ -1,8 +1,9 @@
 package com.intela.realestatebackend.models.profile;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 public class Reference {
 
     @Id
+    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,15 +32,15 @@ public class Reference {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
-    @JsonIgnore
-    @JsonBackReference
-    private CustomerInformation profile;
+    @Schema(hidden = true)
+    @JsonBackReference("profile-references")
+    private Profile profile;
 
     @OneToMany(mappedBy = "reference")
-    @JsonManagedReference
+    @JsonManagedReference("reference-residentialHistories")
     private Set<ResidentialHistory> residentialHistories;
 
     @OneToMany(mappedBy = "reference")
-    @JsonManagedReference
+    @JsonManagedReference("reference-employmentHistories")
     private Set<EmploymentHistory> employmentHistories;
 }

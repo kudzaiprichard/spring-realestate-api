@@ -1,9 +1,8 @@
 package com.intela.realestatebackend.requestResponse;
 
 import com.intela.realestatebackend.models.property.Application;
-import com.intela.realestatebackend.models.property.Bookmark;
-import jakarta.annotation.PostConstruct;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import org.springframework.beans.BeanUtils;
 
@@ -13,10 +12,12 @@ import org.springframework.beans.BeanUtils;
 public class ApplicationResponse extends Application {
     private Integer userId;
     private Integer propertyId;
-    public ApplicationResponse(Application application){
+
+    public ApplicationResponse(Application application) {
         BeanUtils.copyProperties(application, this);
+        init();
     }
-    @PostConstruct
+
     private void init() {
         this.userId = this.getUser() != null ? this.getUser().getId() : null;
         this.propertyId = this.getProperty() != null ? this.getProperty().getId() : null;

@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookmarkRepository extends JpaRepository<Bookmark,Integer> {
+public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
     List<Bookmark> findAllByUserId(Integer userId, Pageable pageRequest);
+
     Bookmark findByPropertyId(Integer propertyId);
 }

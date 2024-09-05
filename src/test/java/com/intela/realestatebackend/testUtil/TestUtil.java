@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TestUtil {
-    public static AuthenticationResponse login(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception{
+    public static AuthenticationResponse login(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception {
         AuthenticationRequest authRequest = new AuthenticationRequest();
         authRequest.setEmail(email);
         authRequest.setPassword(password);

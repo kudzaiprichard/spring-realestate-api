@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeatureResponse{
+public class FeatureResponse {
     private int bathrooms;
     private int bedrooms;
     private int lounges;

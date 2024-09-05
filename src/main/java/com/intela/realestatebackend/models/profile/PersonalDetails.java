@@ -1,7 +1,8 @@
 package com.intela.realestatebackend.models.profile;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +16,7 @@ import lombok.*;
 public class PersonalDetails {
 
     @Id
+    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -26,7 +28,7 @@ public class PersonalDetails {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
-    @JsonIgnore
-    @JsonBackReference
-    private CustomerInformation profile;
+    @Schema(hidden = true)
+    @JsonBackReference("profile-personalDetails")
+    private Profile profile;
 }

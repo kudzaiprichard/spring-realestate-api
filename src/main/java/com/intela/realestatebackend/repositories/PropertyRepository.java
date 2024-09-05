@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Integer> {
     List<Property> findAllByUserId(Integer userId, Pageable pageRequest);
+
     // Plan-specific queries
     List<Plan> findByParentListing(Property property);
 }

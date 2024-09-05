@@ -1,27 +1,32 @@
 package com.intela.realestatebackend.services;
 
+import com.intela.realestatebackend.models.User;
+import com.intela.realestatebackend.models.profile.ApplicationStatus;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
-import com.intela.realestatebackend.models.User;
-import com.intela.realestatebackend.repositories.BookmarkRepository;
-import com.intela.realestatebackend.repositories.PropertyImageRepository;
-import com.intela.realestatebackend.repositories.PropertyRepository;
-import com.intela.realestatebackend.repositories.UserRepository;
-import com.intela.realestatebackend.repositories.CustomerInformationRepository;
+import com.intela.realestatebackend.repositories.*;
 import com.intela.realestatebackend.repositories.application.ApplicationRepository;
-import com.intela.realestatebackend.requestResponse.*;
+import com.intela.realestatebackend.requestResponse.ApplicationRequest;
+import com.intela.realestatebackend.requestResponse.ApplicationResponse;
+import com.intela.realestatebackend.requestResponse.BookmarkResponse;
+import com.intela.realestatebackend.util.Util;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.intela.realestatebackend.util.Util.*;
+import static com.intela.realestatebackend.util.Util.getUserByToken;
+import static com.intela.realestatebackend.util.Util.mapApplicationToApplicationResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +35,13 @@ public class CustomerService {
     private final PropertyRepository propertyRepository;
     private final PropertyImageRepository propertyImageRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final CustomerInformationRepository customerInformationRepository;
+    private final ProfileRepository profileRepository;
     private final JwtService jwtService;
     private final ApplicationRepository applicationRepository;
-    public List<BookmarkResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest){
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public List<BookmarkResponse> fetchAllBookmarksByUserId(HttpServletRequest servletRequest, Pageable pageRequest) {
         User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
         List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId(), pageRequest);
         List<BookmarkResponse> bookmarkResponses = new ArrayList<>();
@@ -43,19 +51,19 @@ public class CustomerService {
         return bookmarkResponses;
     }
 
-    public BookmarkResponse fetchBookmarkById(Integer bookmarkId, HttpServletRequest servletRequest){
+    public BookmarkResponse fetchBookmarkById(Integer bookmarkId, HttpServletRequest servletRequest) {
         User loggedUser = getUserByToken(servletRequest, jwtService, this.userRepository);
         Bookmark bookmark = this.bookmarkRepository.findById(bookmarkId)
-            .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Bookmark not found"));
         if (bookmark.getUser().getId() == loggedUser.getId())
             return new BookmarkResponse(bookmark);
         else
             return null;
     }
 
-    public void addBookmark(Integer propertyId, HttpServletRequest servletRequest){
+    public void addBookmark(Integer propertyId, HttpServletRequest servletRequest) {
 
-        if(this.bookmarkRepository.findByPropertyId(propertyId) != null){
+        if (this.bookmarkRepository.findByPropertyId(propertyId) != null) {
             throw new RuntimeException("Property already exists in your bookmarks");
         }
 
@@ -87,6 +95,7 @@ public class CustomerService {
         this.bookmarkRepository.delete(bookmark);
     }
 
+    @Transactional
     public void createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request) {
         // Retrieve the user by token from the request
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
@@ -105,11 +114,14 @@ public class CustomerService {
                 .employmentHistories(request.getEmploymentHistories())
                 .personalDetails(request.getPersonalDetails())
                 .ids(request.getIds())
+                .status(ApplicationStatus.UNREAD)
+                .submittedDate(new Date(System.currentTimeMillis()))
                 .references(request.getReferences())
                 .build();
 
         // Save the CustomerInformation entity
-        this.customerInformationRepository.save(application);
+        Util.recursiveMerge(entityManager, application);
+        this.applicationRepository.save(application);
     }
 
     public List<ApplicationResponse> getAllApplications(HttpServletRequest servletRequest) {
@@ -161,6 +173,6 @@ public class CustomerService {
         }
 
         // Delete the CustomerInformation (withdraw the application)
-        this.customerInformationRepository.delete(application);
+        this.applicationRepository.delete(application);
     }
 }
