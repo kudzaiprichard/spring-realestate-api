@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.models.Token;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.archetypes.TokenType;
+import com.intela.realestatebackend.models.profile.Profile;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
@@ -68,6 +69,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .profile(new Profile())
                 .build();
 
         var savedUser = userRepository.save(user);

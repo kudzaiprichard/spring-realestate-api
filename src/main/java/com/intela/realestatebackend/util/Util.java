@@ -258,7 +258,7 @@ public class Util {
                                 .name(imageRequest.getOriginalFilename())
                                 .type(imageRequest.getContentType())
                                 .profile(profileRepository.findByProfileOwnerId(userId)
-                                        .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user")))
+                                        .orElseThrow(() -> new RuntimeException("Profile not found for user")))
                                 .build();
                         saveImageToDisk(id);
                         ids.add(idRepository.save(id));
@@ -270,7 +270,7 @@ public class Util {
     }
 
     public static void multipartFileToPropertyImageList(
-            Integer propertyId,
+            Property property,
             PropertyRepository propertyRepository,
             PropertyImageRepository propertyImageRepository,
             MultipartFile[] imagesRequest,
@@ -282,7 +282,7 @@ public class Util {
                                 .image(compressImage(imageRequest.getBytes()))
                                 .name(imageRequest.getOriginalFilename())
                                 .type(imageRequest.getContentType())
-                                .property(propertyRepository.findById(propertyId).orElseThrow(() -> new RuntimeException("Property not found")))
+                                .property(property)
                                 .build();
                         saveImageToDisk(propertyImage);
                         propertyImages.add(propertyImageRepository.save(propertyImage));

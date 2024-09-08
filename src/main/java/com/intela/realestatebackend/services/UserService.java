@@ -2,10 +2,12 @@ package com.intela.realestatebackend.services;
 
 import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.models.User;
+import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.profile.Profile;
 import com.intela.realestatebackend.repositories.ProfileImageRepository;
 import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
 import static com.intela.realestatebackend.util.Util.saveImageToDisk;
@@ -29,12 +33,19 @@ public class UserService {
     private ProfileImageRepository profileImageRepository;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private IDRepository idRepository;
 
     public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        Set<ID> ids = new HashSet<>();
+        Util.multipartFileToIDList(user.getId(), profileRepository, idRepository, images, ids);
+
+        // Update user details based on UpdateProfileRequest
         Profile profile = profileRepository.findByProfileOwnerId(user.getId())
-                .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
+                .orElseThrow(() -> new RuntimeException("Profile not found for user"));
+        profile.setIds(ids);
         // Update user details based on UpdateProfileRequest
         Map<String, Object> updatedFields = Util.updateProfileFromRequest(profile, request);
 
@@ -62,7 +73,7 @@ public class UserService {
     public RetrieveProfileResponse retrieveProfile(HttpServletRequest servletRequest) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         Profile profile = profileRepository.findByProfileOwnerId(user.getId())
-                .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
+                .orElseThrow(() -> new RuntimeException("Profile not found for user"));
         return new RetrieveProfileResponse(profile);
     }
 

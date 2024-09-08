@@ -65,7 +65,7 @@ public class User implements UserDetails {
     private List<Property> properties = new ArrayList<>();
 
     @OneToOne(mappedBy = "profileOwner", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("user-customerInformation")
+    @JsonManagedReference("user-profile")
     @Schema(hidden = true)
     private Profile profile;
 
@@ -106,5 +106,15 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void setRelationships() {
+        // Set bidirectional relationship for ContactDetails
+        if (this.getProfile() != null) {
+            this.getProfile().setProfileOwner(this);
+        }
+
     }
 }

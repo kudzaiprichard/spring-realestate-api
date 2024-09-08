@@ -4,13 +4,18 @@ import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
 import com.intela.realestatebackend.requestResponse.BookmarkResponse;
 import com.intela.realestatebackend.services.CustomerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,9 +60,37 @@ public class CustomerController {
         return ResponseEntity.ok(this.customerService.fetchBookmarkById(bookmarkId, servletRequest));
     }
 
-    @PostMapping("/applications/create/{propertyId}")
-    public ResponseEntity<String> createApplication(@PathVariable Integer propertyId, HttpServletRequest servletRequest, @RequestBody ApplicationRequest request) {
-        this.customerService.createApplication(propertyId, servletRequest, request);
+    @Operation(
+            summary = "Upload application data and images",
+            description = "Uploads an application JSON and associated image files",
+            requestBody = @RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "request", contentType = "application/json"),
+                                    @Encoding(name = "images", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                            {
+                                    @SchemaProperty(
+                                            name = "request",
+                                            schema = @Schema(implementation = ApplicationRequest.class)
+                                    ),
+                                    @SchemaProperty(
+                                            name = "images",
+                                            array = @ArraySchema(
+                                                    schema = @Schema(type = "string", format = "binary")
+                                            )
+                                    )
+                            }
+
+                    )
+            )
+    )
+    @PostMapping(value = "/applications/create/{propertyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createApplication(@PathVariable Integer propertyId, HttpServletRequest servletRequest,
+                                                    @RequestPart("request") ApplicationRequest request, @RequestPart(name = "images", required = false) MultipartFile[] images) {
+        this.customerService.createApplication(propertyId, servletRequest, request, images);
         return ResponseEntity.ok("Application created");
     }
 

@@ -2,6 +2,11 @@ server:
   port: 8090
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -28,10 +33,10 @@ application:
     file-storage:
       image-directory: ./resources/images
 
-logging:
-  level:
-    root: debug  # Set the root logging level to DEBUG
-    org.springframework: debug  # Enable debug logging for Spring Framework classes
-    com.intela.realestatebackend: debug  # Enable debug logging for your application's package
-    org.hibernate.SQL: debug  # Logs all SQL statements
-    org.hibernate.type.descriptor.sql.BasicBinder: trace  # Logs SQL parameters
+#logging:
+#  level:
+ #   root: debug  # Set the root logging level to DEBUG
+  #  org.springframework: debug  # Enable debug logging for Spring Framework classes
+   # com.intela.realestatebackend: debug  # Enable debug logging for your application's package
+    #org.hibernate.SQL: debug  # Logs all SQL statements
+    #org.hibernate.type.descriptor.sql.BasicBinder: trace  # Logs SQL parameters

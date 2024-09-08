@@ -24,7 +24,7 @@ public class ContactDetails {
     private String contactNumber;
     private String contactEmail;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "profile_id")
     @Schema(hidden = true)
     @JsonBackReference("profile-contactDetails")

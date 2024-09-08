@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.services;
 
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.ApplicationStatus;
 import com.intela.realestatebackend.models.property.Application;
@@ -61,12 +62,13 @@ public class DealerService {
         List<PropertyImage> propertyImages = new ArrayList<>();
 
         //Create and save property
-        propertyCreationRequest.setPropertyImages(propertyImages);
-        Property savedProperty = this.propertyRepository.save((Property) propertyCreationRequest);
+        Property savedProperty = propertyCreationRequest;
+        savedProperty.setPropertyImages(propertyImages);
+        savedProperty.setUser(user);
         //set images property id to saved property
 
         try {
-            multipartFileToPropertyImageList(savedProperty.getId(),
+            multipartFileToPropertyImageList(savedProperty,
                     propertyRepository,
                     propertyImageRepository,
                     imagesRequest,
@@ -78,6 +80,7 @@ public class DealerService {
 
         //update, save saved property
         //return "Property was successfully saved";
+        this.propertyRepository.save(savedProperty);
     }
 
     //Fetch a property by property id
@@ -135,7 +138,7 @@ public class DealerService {
         //Update images
         if (imagesRequest.length > 0) {
             List<PropertyImage> propertyImages = new ArrayList<>();
-            multipartFileToPropertyImageList(propertyId, propertyRepository, propertyImageRepository, imagesRequest, propertyImages);
+            multipartFileToPropertyImageList(dbProperty, propertyRepository, propertyImageRepository, imagesRequest, propertyImages);
             List<PropertyImage> dbPropertyImages = this.propertyImageRepository.findAllByPropertyId(dbProperty.getId());
             Property savedProperty = this.propertyRepository.save(dbProperty);
 
@@ -155,7 +158,7 @@ public class DealerService {
         List<PropertyImage> propertyImages = new ArrayList<>();
         Property dbProperty = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
-        multipartFileToPropertyImageList(propertyId, propertyRepository, propertyImageRepository, imagesRequest, propertyImages);
+        multipartFileToPropertyImageList(dbProperty, propertyRepository, propertyImageRepository, imagesRequest, propertyImages);
 
         //set images property id to saved property
         try {
@@ -196,7 +199,7 @@ public class DealerService {
             }
             planCreationRequest.setPropertyImages(propertyImages); // Assuming Plan has a field to store image URLs
         }
-
+        planCreationRequest.setParentListing(parentListing);
         // Step 5: Persist the Plan object
         propertyRepository.save((Plan) planCreationRequest);
     }

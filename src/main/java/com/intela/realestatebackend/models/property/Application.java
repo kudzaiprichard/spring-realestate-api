@@ -16,6 +16,7 @@ import lombok.experimental.SuperBuilder;
 import java.sql.Date;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "property_applications")
 @Getter
 @Setter
@@ -34,6 +35,7 @@ public class Application extends Profile {
     @Schema(hidden = true)
     @JsonBackReference("user-applications")
     private User user;
+
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 

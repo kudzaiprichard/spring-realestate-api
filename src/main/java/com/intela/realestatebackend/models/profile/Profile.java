@@ -26,10 +26,10 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     @Schema(hidden = true)
-    @JsonBackReference("user-customerInformation")
+    @JsonBackReference("user-profile")
     private User profileOwner;
 
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)

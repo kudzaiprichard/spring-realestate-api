@@ -45,9 +45,8 @@ public class AdminService {
     }
 
     public UpdateProfileResponse updateProfile(Integer userId, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
-        // Find the CustomerInformation associated with the userId where propertyId is null
         Profile user = profileRepository.findByProfileOwnerId(userId)
-                .orElseThrow(() -> new RuntimeException("CustomerInformation with propertyId == null not found for user"));
+                .orElseThrow(() -> new RuntimeException("Profile not found for user"));
         Set<ID> ids = new HashSet<>();
         Util.multipartFileToIDList(userId, profileRepository, idRepository, images, ids);
 

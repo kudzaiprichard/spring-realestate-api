@@ -2,11 +2,13 @@ package com.intela.realestatebackend.services;
 
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.ApplicationStatus;
+import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.repositories.*;
 import com.intela.realestatebackend.repositories.application.ApplicationRepository;
+import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
 import com.intela.realestatebackend.requestResponse.BookmarkResponse;
@@ -16,13 +18,18 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
@@ -38,6 +45,10 @@ public class CustomerService {
     private final ProfileRepository profileRepository;
     private final JwtService jwtService;
     private final ApplicationRepository applicationRepository;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private IDRepository idRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -96,32 +107,23 @@ public class CustomerService {
     }
 
     @Transactional
-    public void createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request) {
+    public void createApplication(Integer propertyId, HttpServletRequest servletRequest, ApplicationRequest request, MultipartFile[] images) {
         // Retrieve the user by token from the request
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
-
+        Set<ID> ids = new HashSet<>();
+        Util.multipartFileToIDList(user.getId(), profileRepository, idRepository, images, ids);
         // Find the property by its ID
         Property property = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
 
         // Create a new CustomerInformation entity using the request data
-        Application application = Application.builder()
-                .user(user)
-                .property(property)
-                .contactDetails(request.getContactDetails())
-                .emergencyContacts(request.getEmergencyContacts())
-                .residentialHistories(request.getResidentialHistories())
-                .employmentHistories(request.getEmploymentHistories())
-                .personalDetails(request.getPersonalDetails())
-                .ids(request.getIds())
-                .status(ApplicationStatus.UNREAD)
-                .submittedDate(new Date(System.currentTimeMillis()))
-                .references(request.getReferences())
-                .build();
-
+        request.setStatus(ApplicationStatus.UNREAD);
+        request.setSubmittedDate(new Date(System.currentTimeMillis()));
+        request.setUser(user);
+        request.setProperty(property);
+        ((Application) request).setIds(ids);
         // Save the CustomerInformation entity
-        Util.recursiveMerge(entityManager, application);
-        this.applicationRepository.save(application);
+        Util.recursiveMerge(entityManager, (Application) request);
     }
 
     public List<ApplicationResponse> getAllApplications(HttpServletRequest servletRequest) {
