@@ -18,6 +18,7 @@ public class PropertyResponse extends Property {
     private Integer parentId;
     @JsonIgnore
     private List<PropertyImage> propertyImages;
+
     public PropertyResponse(Property property) {
         BeanUtils.copyProperties(property, this);
         init();

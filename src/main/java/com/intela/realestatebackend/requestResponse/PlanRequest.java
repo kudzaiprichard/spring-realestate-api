@@ -1,22 +1,30 @@
 package com.intela.realestatebackend.requestResponse;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intela.realestatebackend.models.property.Property;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.intela.realestatebackend.models.property.Plan;
 import com.intela.realestatebackend.models.property.PropertyImage;
-import com.intela.realestatebackend.repositories.UserRepository;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Entity
 @SuperBuilder
 @AllArgsConstructor
-public class PropertyCreationRequest extends Property {
-    @JsonIgnore
+@NoArgsConstructor
+public class PlanRequest extends Plan {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<PropertyImage> propertyImages;
+
+    @JsonIgnore
+    private Set<Plan> plans = new HashSet<>();
 }

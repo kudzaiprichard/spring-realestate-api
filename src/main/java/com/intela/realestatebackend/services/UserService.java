@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
-import static com.intela.realestatebackend.util.Util.saveImageToDisk;
 
 @Service
 public class UserService {
@@ -35,12 +34,14 @@ public class UserService {
     private JwtService jwtService;
     @Autowired
     private IDRepository idRepository;
+    @Autowired
+    private ImageService imageService;
 
     public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         Set<ID> ids = new HashSet<>();
-        Util.multipartFileToIDList(user.getId(), profileRepository, idRepository, images, ids);
+        Util.multipartFileToIDList(user.getId(), profileRepository, images, ids, imageService);
 
         // Update user details based on UpdateProfileRequest
         Profile profile = profileRepository.findByProfileOwnerId(user.getId())
@@ -85,12 +86,8 @@ public class UserService {
 
     public void updateProfileImage(HttpServletRequest servletRequest, MultipartFile image) throws IOException {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
-        ProfileImage profileImage = new ProfileImage();
-        profileImage.setUser(user);
-        profileImage.setImage(image.getBytes());
-        profileImage.setName(image.getOriginalFilename());
-        profileImage.setType(image.getContentType());
-        saveImageToDisk(profileImage);
+        ProfileImage profileImage = Util.multipartFileToProfileImage(user,
+                image, imageService);
         profileImageRepository.save(profileImage);
     }
 }

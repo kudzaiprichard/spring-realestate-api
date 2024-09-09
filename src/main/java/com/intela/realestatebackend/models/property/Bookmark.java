@@ -3,7 +3,6 @@ package com.intela.realestatebackend.models.property;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.intela.realestatebackend.models.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

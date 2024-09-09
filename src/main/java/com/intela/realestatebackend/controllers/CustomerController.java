@@ -71,18 +71,18 @@ public class CustomerController {
                             },
                             mediaType = "multipart/form-data",
                             schemaProperties =
-                            {
-                                    @SchemaProperty(
-                                            name = "request",
-                                            schema = @Schema(implementation = ApplicationRequest.class)
-                                    ),
-                                    @SchemaProperty(
-                                            name = "images",
-                                            array = @ArraySchema(
-                                                    schema = @Schema(type = "string", format = "binary")
+                                    {
+                                            @SchemaProperty(
+                                                    name = "request",
+                                                    schema = @Schema(implementation = ApplicationRequest.class)
+                                            ),
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    array = @ArraySchema(
+                                                            schema = @Schema(type = "string", format = "binary")
+                                                    )
                                             )
-                                    )
-                            }
+                                    }
 
                     )
             )

@@ -23,6 +23,7 @@ public class AppConfig {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)

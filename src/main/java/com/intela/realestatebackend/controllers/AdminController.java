@@ -2,6 +2,8 @@ package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.AdminService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,11 +39,38 @@ public class AdminController {
         return ResponseEntity.ok("User " + userId + "deleted");
     }
 
+    @Operation(
+            summary = "Updates user profile",
+            description = "Uploads a user profile JSON object",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "request", contentType = "application/json"),
+                                    @Encoding(name = "images", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                                    {
+                                            @SchemaProperty(
+                                                    name = "request",
+                                                    schema = @Schema(implementation = UpdateProfileRequest.class)
+                                            ),
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    array = @ArraySchema(
+                                                            schema = @Schema(type = "string", format = "binary")
+                                                    )
+                                            )
+                                    }
+
+                    )
+            )
+    )
     @PostMapping("/user-management/profiles/{userId}")
     public ResponseEntity<UpdateProfileResponse> updateProfile(
             @PathVariable Integer userId,
             @RequestPart("images") MultipartFile[] images,
-            @RequestPart("profileJsonData") UpdateProfileRequest request
+            @RequestPart("request") UpdateProfileRequest request
     ) {
         try {
             return ResponseEntity.ok(this.adminService.updateProfile(userId, images, request));

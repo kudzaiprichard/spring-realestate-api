@@ -6,7 +6,6 @@ import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.archetypes.BillType;
 import com.intela.realestatebackend.models.archetypes.PropertyType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

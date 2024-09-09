@@ -6,7 +6,10 @@ import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
-import com.intela.realestatebackend.repositories.*;
+import com.intela.realestatebackend.repositories.BookmarkRepository;
+import com.intela.realestatebackend.repositories.ProfileRepository;
+import com.intela.realestatebackend.repositories.PropertyRepository;
+import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.repositories.application.ApplicationRepository;
 import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
@@ -40,11 +43,11 @@ import static com.intela.realestatebackend.util.Util.mapApplicationToApplication
 public class CustomerService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
-    private final PropertyImageRepository propertyImageRepository;
     private final BookmarkRepository bookmarkRepository;
     private final ProfileRepository profileRepository;
     private final JwtService jwtService;
     private final ApplicationRepository applicationRepository;
+    private final ImageService imageService;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -111,7 +114,7 @@ public class CustomerService {
         // Retrieve the user by token from the request
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         Set<ID> ids = new HashSet<>();
-        Util.multipartFileToIDList(user.getId(), profileRepository, idRepository, images, ids);
+        Util.multipartFileToIDList(user.getId(), profileRepository, images, ids, imageService);
         // Find the property by its ID
         Property property = this.propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
@@ -121,9 +124,9 @@ public class CustomerService {
         request.setSubmittedDate(new Date(System.currentTimeMillis()));
         request.setUser(user);
         request.setProperty(property);
-        ((Application) request).setIds(ids);
+        request.setIds(ids);
         // Save the CustomerInformation entity
-        Util.recursiveMerge(entityManager, (Application) request);
+        this.applicationRepository.save(request);
     }
 
     public List<ApplicationResponse> getAllApplications(HttpServletRequest servletRequest) {

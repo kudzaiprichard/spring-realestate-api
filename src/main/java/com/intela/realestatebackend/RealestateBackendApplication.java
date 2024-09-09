@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 
 import static com.intela.realestatebackend.models.archetypes.Role.ADMIN;
 import static com.intela.realestatebackend.models.archetypes.Role.CUSTOMER;
+
 //TODO: Fix applications double-saving
 @SpringBootApplication
 public class RealestateBackendApplication {

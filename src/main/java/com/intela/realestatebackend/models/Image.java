@@ -1,7 +1,6 @@
 package com.intela.realestatebackend.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

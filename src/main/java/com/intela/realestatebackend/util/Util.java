@@ -2,7 +2,7 @@ package com.intela.realestatebackend.util;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.intela.realestatebackend.models.Image;
+import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.profile.Profile;
@@ -13,8 +13,8 @@ import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.PropertyImageRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
-import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
+import com.intela.realestatebackend.services.ImageService;
 import com.intela.realestatebackend.services.JwtService;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -247,9 +247,9 @@ public class Util {
 
     public static void multipartFileToIDList(Integer userId,
                                              ProfileRepository profileRepository,
-                                             IDRepository idRepository,
                                              MultipartFile[] imagesRequest,
-                                             Set<ID> ids) {
+                                             Set<ID> ids,
+                                             ImageService imageService) {
         Arrays.asList(imagesRequest).forEach(
                 imageRequest -> {
                     try {
@@ -260,8 +260,8 @@ public class Util {
                                 .profile(profileRepository.findByProfileOwnerId(userId)
                                         .orElseThrow(() -> new RuntimeException("Profile not found for user")))
                                 .build();
-                        saveImageToDisk(id);
-                        ids.add(idRepository.save(id));
+                        imageService.storeImage(id);
+                        ids.add(id);
                     } catch (IOException e) {
                         throw new RuntimeException("Could not save image: " + e);
                     }
@@ -271,10 +271,9 @@ public class Util {
 
     public static void multipartFileToPropertyImageList(
             Property property,
-            PropertyRepository propertyRepository,
-            PropertyImageRepository propertyImageRepository,
             MultipartFile[] imagesRequest,
-            List<PropertyImage> propertyImages) {
+            List<PropertyImage> propertyImages,
+            ImageService imageService) {
         Arrays.asList(imagesRequest).forEach(
                 imageRequest -> {
                     try {
@@ -284,8 +283,8 @@ public class Util {
                                 .type(imageRequest.getContentType())
                                 .property(property)
                                 .build();
-                        saveImageToDisk(propertyImage);
-                        propertyImages.add(propertyImageRepository.save(propertyImage));
+                        imageService.storeImage(propertyImage);
+                        propertyImages.add(propertyImage);
                     } catch (IOException e) {
                         throw new RuntimeException("Could not save image: " + e);
                     }
@@ -295,10 +294,6 @@ public class Util {
 
     public static ApplicationResponse mapApplicationToApplicationResponse(Application application) {
         return new ApplicationResponse(application);
-    }
-
-    public static void saveImageToDisk(Image image) {
-
     }
 
     /**
@@ -399,5 +394,16 @@ public class Util {
      */
     public static boolean isEntity(Class<?> clazz) {
         return clazz.isAnnotationPresent(Entity.class);
+    }
+
+    public static ProfileImage multipartFileToProfileImage(User user, MultipartFile image, ImageService imageService) throws IOException {
+        ProfileImage profileImage = ProfileImage.builder()
+                .image(compressImage(image.getBytes()))
+                .name(image.getOriginalFilename())
+                .type(image.getContentType())
+                .user(user)
+                .build();
+        imageService.storeImage(profileImage);
+        return profileImage;
     }
 }

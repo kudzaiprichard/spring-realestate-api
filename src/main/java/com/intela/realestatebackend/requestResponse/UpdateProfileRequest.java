@@ -1,24 +1,24 @@
 package com.intela.realestatebackend.requestResponse;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.profile.Profile;
-import com.intela.realestatebackend.repositories.UserRepository;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@NoArgsConstructor
 @Data
 @SuperBuilder
 @AllArgsConstructor
 public class UpdateProfileRequest extends Profile {
-    @Autowired
-    private UserRepository userRepository;
-    private Integer userId;
-
-    {
-        this.setProfileOwner(userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found")));
-    }
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Set<ID> ids;
 }

@@ -7,7 +7,6 @@ import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

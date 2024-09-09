@@ -32,6 +32,9 @@ public class AdminService {
     @Autowired
     private IDRepository idRepository;
 
+    @Autowired
+    private final ImageService imageService;
+
     public List<RetrieveProfileResponse> listAllProfiles() {
         // Retrieve profiles where property_id is null
         return profileRepository.findAll().stream()
@@ -48,7 +51,7 @@ public class AdminService {
         Profile user = profileRepository.findByProfileOwnerId(userId)
                 .orElseThrow(() -> new RuntimeException("Profile not found for user"));
         Set<ID> ids = new HashSet<>();
-        Util.multipartFileToIDList(userId, profileRepository, idRepository, images, ids);
+        Util.multipartFileToIDList(userId, profileRepository, images, ids, imageService);
 
         // Update user details based on UpdateProfileRequest
         user.setIds(ids);

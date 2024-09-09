@@ -3,6 +3,8 @@ package com.intela.realestatebackend.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.DealerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -27,15 +29,42 @@ public class DealerController {
     private final DealerService dealerService;
     private final ObjectMapper objectMapper;
 
+    @Operation(
+            summary = "Upload a new property with images",
+            description = "Uploads a property JSON and associated image files",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "request", contentType = "application/json"),
+                                    @Encoding(name = "images", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                                    {
+                                            @SchemaProperty(
+                                                    name = "request",
+                                                    schema = @Schema(implementation = PropertyRequest.class)
+                                            ),
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    array = @ArraySchema(
+                                                            schema = @Schema(type = "string", format = "binary")
+                                                    )
+                                            )
+                                    }
+
+                    )
+            )
+    )
     @PostMapping("/property/add")
     public ResponseEntity<String> addProperty(
             @RequestPart("images") MultipartFile[] images,
-            @RequestPart(value = "propertyJsonData") PropertyCreationRequest propertyCreationRequest,
+            @RequestPart(value = "request") PropertyRequest request,
             HttpServletRequest servletRequest
     ) {
         try {
             dealerService.addProperty(
-                    propertyCreationRequest,
+                    request,
                     servletRequest,
                     images
             );
@@ -89,20 +118,40 @@ public class DealerController {
         return ResponseEntity.ok("Property has been deleted successfully");
     }
 
+    @Operation(
+            summary = "Updates property",
+            description = "Uploads a property JSON object",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "request", contentType = "application/json"),
+                                    @Encoding(name = "images", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                                    {
+                                            @SchemaProperty(
+                                                    name = "request",
+                                                    schema = @Schema(implementation = UpdateProfileRequest.class)
+                                            ),
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    array = @ArraySchema(
+                                                            schema = @Schema(type = "string", format = "binary")
+                                                    )
+                                            )
+                                    }
+
+                    )
+            )
+    )
     @PutMapping("/property/{propertyId}")
     public ResponseEntity<String> updatePropertyById(
             @PathVariable Integer propertyId,
             @RequestParam("images") MultipartFile[] images,
-            @RequestParam(value = "propertyJsonData") String propertyJsonData
+            @RequestParam(value = "request") PropertyRequest request
     ) {
-        PropertyCreationRequest propertyCreationRequest;
-        try {
-            propertyCreationRequest = objectMapper.readValue(propertyJsonData, PropertyCreationRequest.class);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to phase json to object");
-        }
-        this.dealerService.updatePropertyById(propertyCreationRequest, images, propertyId);
+        this.dealerService.updatePropertyById(request, images, propertyId);
         return ResponseEntity.ok("Property updated successfully");
     }
 
@@ -118,15 +167,42 @@ public class DealerController {
         return ResponseEntity.accepted().body("Image deleted successfully");
     }
 
+    @Operation(
+            summary = "Uploads a new plan with images to property",
+            description = "Uploads a plan JSON and associated image files",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "request", contentType = "application/json"),
+                                    @Encoding(name = "images", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                                    {
+                                            @SchemaProperty(
+                                                    name = "request",
+                                                    schema = @Schema(implementation = PlanRequest.class)
+                                            ),
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    array = @ArraySchema(
+                                                            schema = @Schema(type = "string", format = "binary")
+                                                    )
+                                            )
+                                    }
+
+                    )
+            )
+    )
     @PostMapping("/property/plan/add/{propertyId}")
     public ResponseEntity<String> addPlanToProperty(@PathVariable Integer propertyId,
                                                     @RequestPart("images") MultipartFile[] images,
-                                                    @RequestPart(value = "propertyJsonData") PlanCreationRequest planCreationRequest,
+                                                    @RequestPart(value = "request") PlanRequest request,
                                                     HttpServletRequest servletRequest) {
         try {
             dealerService.addPlan(
                     propertyId,
-                    planCreationRequest,
+                    request,
                     servletRequest,
                     images
             );

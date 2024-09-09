@@ -2,6 +2,8 @@ package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,38 @@ import java.io.IOException;
 public class UserController {
     private final UserService userService;
 
+    @Operation(
+            summary = "Updates user profile",
+            description = "Uploads a user profile JSON object",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "request", contentType = "application/json"),
+                                    @Encoding(name = "images", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                                    {
+                                            @SchemaProperty(
+                                                    name = "request",
+                                                    schema = @Schema(implementation = UpdateProfileRequest.class)
+                                            ),
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    array = @ArraySchema(
+                                                            schema = @Schema(type = "string", format = "binary")
+                                                    )
+                                            )
+                                    }
+
+                    )
+            )
+    )
     @PostMapping("/profile")
     public ResponseEntity<UpdateProfileResponse> updateProfile(
             HttpServletRequest servletRequest,
             @RequestPart("images") MultipartFile[] images,
-            @RequestPart("profileJsonData") UpdateProfileRequest request
+            @RequestPart("request") UpdateProfileRequest request
     ) {
         try {
             return ResponseEntity.ok().body(userService.updateProfile(servletRequest, images, request));

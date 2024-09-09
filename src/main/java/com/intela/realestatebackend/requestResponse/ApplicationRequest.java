@@ -18,7 +18,7 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationRequest extends Application{
+public class ApplicationRequest extends Application {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Set<ID> ids;
 }
