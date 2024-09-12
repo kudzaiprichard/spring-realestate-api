@@ -20,7 +20,7 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
             """)
     List<Token> findAllValidTokenByUser(Integer userId);
 
-    Optional<Token> findByToken(String token);
+    Optional<Token> findByTokenAndExpiredFalseAndRevokedFalse(String token);
 
     @Query("SELECT u\n" +
             "FROM users u\n" +

@@ -95,7 +95,7 @@ public class AuthIntegrationTest extends BaseTestContainerTest {
         AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, EMAIL, PASSWORD);
         String accessToken = authenticationResponse.getAccessToken();
         TestUtil.testResetPasswordAndLogout(mockMvc, objectMapper, accessToken, PASSWORD + "1");
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(AssertionError.class, () -> {
             TestUtil.testLogin(mockMvc, objectMapper, EMAIL, PASSWORD);
         });
         authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, EMAIL, PASSWORD + "1");

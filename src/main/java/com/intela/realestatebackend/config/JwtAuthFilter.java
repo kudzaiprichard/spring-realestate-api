@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.config;
 
+import com.intela.realestatebackend.models.Token;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.services.JwtService;
 import jakarta.servlet.FilterChain;
@@ -43,9 +44,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         userEmail = jwtService.extractUsername(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var isTokenValid = tokenRepository.findByToken(jwt)
-                    .map(token -> !token.getRevoked() && !token.getExpired())
-                    .orElseThrow(() -> new RuntimeException("Please enter valid token"));
+            boolean isTokenValid;
+            try {
+                isTokenValid = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalse(jwt)
+                        .map(token -> !token.getRevoked() && !token.getExpired())
+                        .orElseThrow(() -> new RuntimeException("Please enter valid token"));
+            } catch (RuntimeException e) {
+                System.err.println("JWT validation failed: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("Access Denied: Invalid or Expired JWT Token");
+                response.getWriter().flush();
+                return;
+            }
 
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
@@ -60,6 +70,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+
         }
         filterChain.doFilter(request, response);
     }

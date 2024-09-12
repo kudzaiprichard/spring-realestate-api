@@ -33,7 +33,7 @@ public class LogoutService implements LogoutHandler {
 
         jwt = authHeader.split(" ")[1].trim();
 
-        var isTokenValid = tokenRepository.findByToken(jwt)
+        var isTokenValid = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalse(jwt)
                 .map(token -> !token.getRevoked() && !token.getExpired() && token.getTokenType().equals(TokenType.ACCESS))
                 .orElse(false);
 

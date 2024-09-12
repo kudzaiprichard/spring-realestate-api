@@ -147,7 +147,7 @@ public class AuthService {
             var user = this.userRepository.findByEmail(userEmail)
                     .orElseThrow(() -> new RuntimeException("Please enter valid token"));
 
-            var isTokenValid = tokenRepository.findByToken(refreshToken)
+            var isTokenValid = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalse(refreshToken)
                     .map(token -> !token.getRevoked() && !token.getExpired() && token.getTokenType().equals(TokenType.REFRESH))
                     .orElse(false);
 

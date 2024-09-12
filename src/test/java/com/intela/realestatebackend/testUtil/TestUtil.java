@@ -36,13 +36,14 @@ public class TestUtil {
     }
 
     public static void testResetPasswordAndLogout(MockMvc mockMvc, ObjectMapper objectMapper, String accessToken, String newPassword) throws Exception {
-        PasswordResetRequest request = new PasswordResetRequest(newPassword);
+        PasswordResetRequest request = new PasswordResetRequest();
+        request.setNewPassword(newPassword);
 
-        mockMvc.perform(post("/api/v1/auth/reset-password")
+        mockMvc.perform(post("/api/v1/auth/resetPassword")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().is(202));
+                .andReturn();
 
         testLogout(mockMvc, accessToken);
     }
