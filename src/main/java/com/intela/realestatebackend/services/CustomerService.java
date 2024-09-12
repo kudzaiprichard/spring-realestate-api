@@ -60,7 +60,9 @@ public class CustomerService {
         List<Bookmark> bookmarks = this.bookmarkRepository.findAllByUserId(loggedUser.getId(), pageRequest);
         List<BookmarkResponse> bookmarkResponses = new ArrayList<>();
 
-        bookmarks.forEach(BookmarkResponse::new);
+        bookmarks.forEach(bookmark -> {
+            bookmarkResponses.add(new BookmarkResponse(bookmark));
+        });
 
         return bookmarkResponses;
     }

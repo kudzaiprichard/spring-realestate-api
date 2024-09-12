@@ -30,9 +30,7 @@ public class PropertyService {
     }
 
     public PropertyResponse fetchPropertyById(Integer propertyId) {
-        Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found with id: " + propertyId));
-        return new PropertyResponse(property);
+        return Util.getPropertyById(propertyId, propertyRepository);
     }
 
     public List<PropertyImageResponse> fetchAllImagesByPropertyId(Integer propertyId) {

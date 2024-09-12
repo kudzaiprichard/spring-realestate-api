@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import org.springframework.beans.BeanUtils;
 
+import java.sql.Date;
 import java.util.List;
 
 @Data

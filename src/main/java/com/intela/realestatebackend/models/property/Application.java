@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Date;
 
@@ -38,6 +39,8 @@ public class Application extends Profile {
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
+    @CreationTimestamp
+    @Column(updatable = false)
     private Date submittedDate;
 
     @PrePersist

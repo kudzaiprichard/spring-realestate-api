@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,7 +39,8 @@ public class Property {
     private Integer numberOfRooms;
     @Enumerated(EnumType.STRING)
     private PropertyType propertyType;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PropertyStatus status = PropertyStatus.AVAILABLE;
     private Long price;
     @Enumerated(EnumType.STRING)
     private BillType billType;
@@ -91,4 +94,8 @@ public class Property {
     @OneToMany(mappedBy = "parentListing", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("property-plans")
     private Set<Plan> plans = new HashSet<>();
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Date createdDate;
 }

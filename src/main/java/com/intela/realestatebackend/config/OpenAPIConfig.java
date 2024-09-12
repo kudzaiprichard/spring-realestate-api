@@ -1,7 +1,6 @@
 package com.intela.realestatebackend.config;
 
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -23,7 +22,12 @@ public class OpenAPIConfig {
                                         .bearerFormat("JWT")))
                 .info(new Info().title("API Documentation")
                         .version("1.0")
-                        .description("API documentation for your application"));
+                        .description("API documentation for your application"))
+                .paths(new Paths()
+                        .addPathItem("/api/v1/auth/logout", new PathItem().post(
+                                new Operation().summary("Logs out the user and invalidates the token")
+                        ))
+                );
     }
 }
 

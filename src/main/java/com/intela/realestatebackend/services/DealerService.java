@@ -104,7 +104,7 @@ public class DealerService {
         if (!property.getLocation().isBlank()) {
             dbProperty.setLocation(property.getLocation());
         }
-        if (!property.getStatus().isBlank()) {
+        if (!(property.getStatus() == null)) {
             dbProperty.setStatus(property.getStatus());
         }
         if (!property.getDescription().isBlank()) {

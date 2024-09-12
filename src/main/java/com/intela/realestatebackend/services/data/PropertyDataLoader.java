@@ -7,6 +7,7 @@ import com.intela.realestatebackend.models.archetypes.Role;
 import com.intela.realestatebackend.models.property.Feature;
 import com.intela.realestatebackend.models.property.Plan;
 import com.intela.realestatebackend.models.property.Property;
+import com.intela.realestatebackend.models.property.PropertyStatus;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -51,7 +52,6 @@ public class PropertyDataLoader implements CommandLineRunner {
                         .description("Property " + i + " owned by " + dealer.getFirstName())
                         .numberOfRooms(3 + i)  // Dummy number of rooms
                         .propertyType(PropertyType.HOUSE)  // Assuming PropertyType.HOUSE is defined
-                        .status("Available")
                         .feature(feature)
                         .price(500000L + (i * 10000L))  // Dummy price
                         .billType(BillType.INCLUDED)  // Assuming BillType.MONTHLY is defined
@@ -93,7 +93,6 @@ public class PropertyDataLoader implements CommandLineRunner {
                             .description("Plan " + i + " for property " + property.getId())
                             .numberOfRooms(property.getNumberOfRooms())
                             .propertyType(PropertyType.ENSUITE)
-                            .status("Available")
                             .feature(feature)
                             .price(property.getPrice() + (i * 10000L))  // Adjust price for each plan
                             .billType(property.getBillType())

@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TestUtil {
-    public static AuthenticationResponse login(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception {
+    public static AuthenticationResponse testLogin(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception {
         AuthenticationRequest authRequest = new AuthenticationRequest();
         authRequest.setEmail(email);
         authRequest.setPassword(password);
@@ -19,7 +19,7 @@ public class TestUtil {
         String authResponse = mockMvc.perform(post("/api/v1/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(authRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().is(202))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -29,19 +29,21 @@ public class TestUtil {
         return authenticationResponse;
     }
 
-    public static void logout(MockMvc mockMvc, String accessToken) throws Exception {
+    public static void testLogout(MockMvc mockMvc, String accessToken) throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());  // Logout should be successful
     }
 
-    public static void resetPassword(MockMvc mockMvc, ObjectMapper objectMapper, String accessToken, String newPassword) throws Exception {
+    public static void testResetPasswordAndLogout(MockMvc mockMvc, ObjectMapper objectMapper, String accessToken, String newPassword) throws Exception {
         PasswordResetRequest request = new PasswordResetRequest(newPassword);
 
         mockMvc.perform(post("/api/v1/auth/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isOk());
+                .andExpect(status().is(202));
+
+        testLogout(mockMvc, accessToken);
     }
 }

@@ -7,6 +7,7 @@ import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.profile.Profile;
 import com.intela.realestatebackend.models.property.Application;
+import com.intela.realestatebackend.models.property.Plan;
 import com.intela.realestatebackend.models.property.Property;
 import com.intela.realestatebackend.models.property.PropertyImage;
 import com.intela.realestatebackend.repositories.ProfileRepository;
@@ -101,7 +102,8 @@ public class Util {
 
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
-
+        List<Plan> plans = propertyRepository.findByParentListing(property);
+        property.setPlans(new HashSet<>(plans));
         return getPropertyResponse(property);
     }
 
