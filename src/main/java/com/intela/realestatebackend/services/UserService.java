@@ -12,7 +12,10 @@ import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -33,9 +36,8 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
     @Autowired
-    private IDRepository idRepository;
-    @Autowired
     private ImageService imageService;
+
 
     public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
@@ -89,5 +91,10 @@ public class UserService {
         ProfileImage profileImage = Util.multipartFileToProfileImage(user,
                 image, imageService);
         profileImageRepository.save(profileImage);
+    }
+
+    public RetrieveAccountResponse retrieveAccount(HttpServletRequest servletRequest) {
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        return new RetrieveAccountResponse(user);
     }
 }

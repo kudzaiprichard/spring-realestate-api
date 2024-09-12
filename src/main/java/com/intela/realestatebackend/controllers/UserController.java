@@ -1,6 +1,7 @@
 package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.*;
+import com.intela.realestatebackend.services.AuthService;
 import com.intela.realestatebackend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.*;
@@ -95,5 +96,12 @@ public class UserController {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<RetrieveAccountResponse> retrieveAccount(
+            HttpServletRequest servletRequest
+    ) {
+        return ResponseEntity.ok().body(userService.retrieveAccount(servletRequest));
     }
 }

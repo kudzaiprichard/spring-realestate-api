@@ -67,13 +67,13 @@ public class AuthIntegrationTest extends BaseTestContainerTest {
         String accessToken = authenticationResponse.getAccessToken();
 
         // Step 2: Verify that the token allows access to a protected endpoint
-        mockMvc.perform(get("/api/v1/auth/user").header("Authorization", "Bearer " + accessToken)).andExpect(status().isOk());  // Access should be granted
+        mockMvc.perform(get("/api/v1/user/").header("Authorization", "Bearer " + accessToken)).andExpect(status().isOk());  // Access should be granted
 
         // Step 3: Log out the user to invalidate the tokens
         TestUtil.testLogout(mockMvc, accessToken);
 
         // Step 4: Attempt to access the protected endpoint again with the same token
-        mockMvc.perform(get("/api/v1/auth/user").header("Authorization", "Bearer " + accessToken)).andExpect(status().isUnauthorized());  // Access should be denied
+        mockMvc.perform(get("/api/v1/user/").header("Authorization", "Bearer " + accessToken)).andExpect(status().is(403));  // Access should be denied
     }
 
     @Test
