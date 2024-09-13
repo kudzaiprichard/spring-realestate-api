@@ -3,6 +3,7 @@ package com.intela.realestatebackend.config;
 import com.intela.realestatebackend.models.archetypes.TokenType;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.services.JwtService;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+
         jwt = authHeader.split(" ")[1].trim();
         try {
             userEmail = jwtService.extractUsername(jwt);
@@ -50,6 +54,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.getWriter().write("Access Denied: Invalid or Expired JWT Token");
             response.getWriter().flush();
             return;
+        } catch (IllegalArgumentException | MalformedJwtException e) {
+            // Catching any JWT parsing or format issues
+            System.err.println("Invalid JWT format: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Bad Request: Invalid JWT format");
+            response.getWriter().flush();
+            return;
         }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -57,14 +68,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 isTokenValid = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalse(jwt)
                         .map(token -> !token.getRevoked() && !token.getExpired() && token.getTokenType().equals(TokenType.ACCESS))
-                        .orElseThrow(() -> new RuntimeException("Please enter valid token"));
-                if (!isTokenValid){
-                    throw new RuntimeException("Please enter a valid ACCESS token");
+                        .orElseThrow(() -> new AccessDeniedException("Please enter a valid ACCESS token"));
+
+                if (!isTokenValid) {
+                    throw new AccessDeniedException("Please enter a valid ACCESS token");
                 }
-            } catch (RuntimeException e) {
+            } catch (AccessDeniedException e) {
                 System.err.println("JWT validation failed: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("Access Denied: Invalid or Expired JWT Token");
+                response.getWriter().flush();
+                return;
+            } catch (RuntimeException e) {
+                // General runtime exception handling
+                System.err.println("Unexpected error: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("Server Error");
                 response.getWriter().flush();
                 return;
             }

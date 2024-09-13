@@ -1,6 +1,8 @@
 package com.intela.realestatebackend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intela.realestatebackend.exceptions.MissingAccessTokenException;
+import com.intela.realestatebackend.exceptions.MissingRefreshTokenException;
 import com.intela.realestatebackend.models.Token;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.archetypes.TokenType;
@@ -188,10 +190,24 @@ public class AuthService {
     }
 
     public RetrieveAccountResponse getUserByAccessToken(String accessToken) {
-        return Util.mapToRetrieveAccountResponse(tokenRepository.findUserByAccessToken(accessToken));
+        if (accessToken == null){
+            throw new MissingAccessTokenException("Missing access token");
+        }
+        User user = tokenRepository.findUserByAccessToken(accessToken);
+        if (user == null){
+            throw new MissingAccessTokenException("Missing access token");
+        }
+        return Util.mapToRetrieveAccountResponse(user);
     }
 
     public RetrieveAccountResponse getUserByRefreshToken(String refreshToken) {
-        return Util.mapToRetrieveAccountResponse(tokenRepository.findUserByRefreshToken(refreshToken));
+        if (refreshToken == null){
+            throw new MissingRefreshTokenException("Missing refresh token");
+        }
+        User user = tokenRepository.findUserByRefreshToken(refreshToken);
+        if (user == null){
+            throw new MissingRefreshTokenException("Missing refresh token");
+        }
+        return Util.mapToRetrieveAccountResponse(user);
     }
 }

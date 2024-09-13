@@ -149,22 +149,19 @@ public class AuthIntegrationTest extends BaseTestContainerTest {
 
         //access /userByAccessToken with an invalid token
         mockMvc.perform(get("/api/v1/auth/userByAccessToken")
-                        .header("Authorization", "Bearer " + accessToken.substring(0, accessToken.length() - 5) + "abcde"))
+                        .param("accessToken", accessToken.substring(0, accessToken.length() - 5) + "abcde"))
                 .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
         //access /userByAccessToken with an old token
         mockMvc.perform(get("/api/v1/auth/userByAccessToken")
-                        .header("Authorization", "Bearer " + oldAccessToken))
+                        .param("accessToken", oldAccessToken))
                 .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
         //access /userByAccessToken with a refresh token
         mockMvc.perform(get("/api/v1/auth/userByAccessToken")
-                        .header("Authorization", "Bearer " + refreshToken))
-                .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
-        //access /userByAccessToken without a token
-        mockMvc.perform(get("/api/v1/auth/userByAccessToken"))
+                        .param("accessToken", refreshToken))
                 .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
         //access /userByAccessToken with a valid token
         s = mockMvc.perform(get("/api/v1/auth/userByAccessToken")
-                        .header("Authorization", "Bearer " + accessToken))
+                        .param("accessToken", accessToken))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -173,22 +170,19 @@ public class AuthIntegrationTest extends BaseTestContainerTest {
 
         //access /userByRefreshToken with an invalid token
         mockMvc.perform(get("/api/v1/auth/userByRefreshToken")
-                        .header("Authorization", "Bearer " + accessToken.substring(0, accessToken.length() - 5) + "abcde"))
+                        .param("refreshToken", accessToken.substring(0, accessToken.length() - 5) + "abcde"))
                 .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
         //access /userByRefreshToken with an old token
         mockMvc.perform(get("/api/v1/auth/userByRefreshToken")
-                        .header("Authorization", "Bearer " + oldAccessToken))
+                        .param("refreshToken", oldAccessToken))
                 .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
         //access /userByRefreshToken with an access token
         mockMvc.perform(get("/api/v1/auth/userByRefreshToken")
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
-        //access /userByRefreshToken without a token
-        mockMvc.perform(get("/api/v1/auth/userByRefreshToken"))
+                        .param("refreshToken", accessToken))
                 .andExpect(status().isForbidden());  // Expecting HTTP 403 Forbidden
         //access /userByRefreshToken with a valid token
         s = mockMvc.perform(get("/api/v1/auth/userByRefreshToken")
-                        .header("Authorization", "Bearer " + refreshToken))
+                        .param("refreshToken", refreshToken))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

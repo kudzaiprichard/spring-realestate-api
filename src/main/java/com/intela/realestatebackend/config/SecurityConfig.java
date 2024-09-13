@@ -39,8 +39,6 @@ public class SecurityConfig {
                         .permitAll()
                         // Restrict these auth-related endpoints to authenticated users
                         .requestMatchers("/api/v1/auth/user",
-                                "/api/v1/auth/userByAccessToken",
-                                "/api/v1/auth/userByRefreshToken",
                                 "/api/v1/auth/resetPassword")
                         .authenticated()
                         // Allow access to Swagger UI and API docs

@@ -2,6 +2,7 @@ package com.intela.realestatebackend.util;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.intela.realestatebackend.exceptions.MissingAccessTokenException;
 import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.ID;
@@ -42,7 +43,7 @@ public class Util {
         final String jwtToken;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Please enter a valid token");
+            throw new MissingAccessTokenException("Please enter a valid token");
         }
 
         jwtToken = authHeader.split(" ")[1].trim();
@@ -154,7 +155,6 @@ public class Util {
     }
 
     public static RetrieveAccountResponse mapToRetrieveAccountResponse(User user) {
-        // Implement mapping logic here
         return new RetrieveAccountResponse(user);
     }
 

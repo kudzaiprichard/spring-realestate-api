@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.models.archetypes.Role;
 import com.intela.realestatebackend.models.profile.Profile;
@@ -78,6 +79,7 @@ public class User implements UserDetails {
     private Set<Application> applications;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
     }
