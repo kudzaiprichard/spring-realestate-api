@@ -5,7 +5,6 @@ import com.intela.realestatebackend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +38,12 @@ public class AuthController {
     }
 
     @PostMapping(value = "/resetPassword")
-    public ResponseEntity<PasswordResetResponse> resetPassword(
+    public ResponseEntity<String> resetPassword(
             @RequestBody PasswordResetRequest request,
             HttpServletRequest servletRequest
     ) {
-        return ResponseEntity.accepted()
-                .body(authService.resetPassword(servletRequest, request));
+        authService.resetPassword(servletRequest, request);
+        return ResponseEntity.accepted().body("Password reset successfully");
     }
 
     /*

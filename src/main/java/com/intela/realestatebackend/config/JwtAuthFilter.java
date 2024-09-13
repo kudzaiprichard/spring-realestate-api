@@ -1,8 +1,9 @@
 package com.intela.realestatebackend.config;
 
-import com.intela.realestatebackend.models.Token;
+import com.intela.realestatebackend.models.archetypes.TokenType;
 import com.intela.realestatebackend.repositories.TokenRepository;
 import com.intela.realestatebackend.services.JwtService;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,14 +42,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
         jwt = authHeader.split(" ")[1].trim();
-        userEmail = jwtService.extractUsername(jwt);
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (SignatureException e) {
+            System.err.println("JWT validation failed: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("Access Denied: Invalid or Expired JWT Token");
+            response.getWriter().flush();
+            return;
+        }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             boolean isTokenValid;
             try {
                 isTokenValid = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalse(jwt)
-                        .map(token -> !token.getRevoked() && !token.getExpired())
+                        .map(token -> !token.getRevoked() && !token.getExpired() && token.getTokenType().equals(TokenType.ACCESS))
                         .orElseThrow(() -> new RuntimeException("Please enter valid token"));
+                if (!isTokenValid){
+                    throw new RuntimeException("Please enter a valid ACCESS token");
+                }
             } catch (RuntimeException e) {
                 System.err.println("JWT validation failed: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);

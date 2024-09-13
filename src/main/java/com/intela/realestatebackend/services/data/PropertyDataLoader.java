@@ -7,7 +7,6 @@ import com.intela.realestatebackend.models.archetypes.Role;
 import com.intela.realestatebackend.models.property.Feature;
 import com.intela.realestatebackend.models.property.Plan;
 import com.intela.realestatebackend.models.property.Property;
-import com.intela.realestatebackend.models.property.PropertyStatus;
 import com.intela.realestatebackend.repositories.PropertyRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
 import jakarta.transaction.Transactional;

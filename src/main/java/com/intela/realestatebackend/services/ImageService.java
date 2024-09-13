@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.intela.realestatebackend.util.Util.decompressImage;
-
 @Service
 public class ImageService {
 
@@ -18,7 +16,7 @@ public class ImageService {
 
     public void storeImage(Image image) throws IOException {
         String outputPath = imageStorageDirectory;
-        byte [] imageBytes = image.getImage();
+        byte[] imageBytes = image.getImage();
         FileOutputStream fileOutputStream = null;
         try {
             // Create a new File object for the output path

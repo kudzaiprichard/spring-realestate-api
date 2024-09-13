@@ -94,7 +94,7 @@ public class AuthService {
     ) {
         User user = getUserByToken(request, jwtService, this.userRepository);
         return LoggedUserResponse.builder()
-                .firstname(user.getFirstName())
+                .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .mobileNumber(user.getMobileNumber())
@@ -169,7 +169,7 @@ public class AuthService {
         }
     }
 
-    public PasswordResetResponse resetPassword(HttpServletRequest servletRequest, PasswordResetRequest request) {
+    public void resetPassword(HttpServletRequest servletRequest, PasswordResetRequest request) {
         // Extract user information from the servletRequest
         String userEmail = servletRequest.getUserPrincipal().getName(); // Assuming user email is the principal's name
 
@@ -185,11 +185,6 @@ public class AuthService {
 
         // Save the updated user
         userRepository.save(user);
-
-        // Return a successful PasswordResetResponse
-        PasswordResetResponse response = new PasswordResetResponse();
-
-        return response;
     }
 
     public RetrieveAccountResponse getUserByAccessToken(String accessToken) {

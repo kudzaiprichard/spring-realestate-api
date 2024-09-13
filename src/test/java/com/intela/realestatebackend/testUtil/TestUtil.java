@@ -25,8 +25,7 @@ public class TestUtil {
                 .getContentAsString();
 
         // Extract the access token from the response
-        AuthenticationResponse authenticationResponse = objectMapper.readValue(authResponse, AuthenticationResponse.class);
-        return authenticationResponse;
+        return objectMapper.readValue(authResponse, AuthenticationResponse.class);
     }
 
     public static void testLogout(MockMvc mockMvc, String accessToken) throws Exception {
@@ -43,6 +42,7 @@ public class TestUtil {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().is(202))
                 .andReturn();
 
         testLogout(mockMvc, accessToken);

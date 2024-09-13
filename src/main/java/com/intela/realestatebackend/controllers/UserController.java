@@ -1,7 +1,6 @@
 package com.intela.realestatebackend.controllers;
 
 import com.intela.realestatebackend.requestResponse.*;
-import com.intela.realestatebackend.services.AuthService;
 import com.intela.realestatebackend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.*;

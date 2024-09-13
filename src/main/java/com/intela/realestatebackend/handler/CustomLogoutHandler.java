@@ -20,10 +20,11 @@ public class CustomLogoutHandler implements LogoutHandler {
     private UserRepository userRepository;
     @Autowired
     private AuthService authService;
+
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         User user = Util.getUserByToken(request, jwtService, userRepository);
-        if (user != null){
+        if (user != null) {
             authService.revokeAllUserTokens(user);
         }
     }
