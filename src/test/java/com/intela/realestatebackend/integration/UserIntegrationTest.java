@@ -62,7 +62,9 @@ public class UserIntegrationTest extends BaseTestContainerTest {
                 "image/jpeg",            // Content type
                 "".getBytes() // File content
         );
-        mockMvc.perform(multipart("/api/v1/user/profile").file(image1).file(requestPart)
+        mockMvc.perform(multipart("/api/v1/user/profile")
+                        .file(image1)
+                        .file(requestPart)
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());
 
