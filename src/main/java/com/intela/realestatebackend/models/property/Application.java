@@ -43,42 +43,4 @@ public class Application extends Profile {
     @Column(updatable = false)
     private Date submittedDate;
 
-    @PrePersist
-    @PreUpdate
-    public void setRelationships() {
-        // Set bidirectional relationship for ContactDetails
-        if (this.getContactDetails() != null) {
-            this.getContactDetails().setProfile(this);
-        }
-
-        // Set bidirectional relationship for EmergencyContacts
-        if (this.getEmergencyContacts() != null) {
-            this.getEmergencyContacts().forEach(contact -> contact.setProfile(this));
-        }
-
-        // Set bidirectional relationship for ResidentialHistories
-        if (this.getResidentialHistories() != null) {
-            this.getResidentialHistories().forEach(history -> history.setProfile(this));
-        }
-
-        // Set bidirectional relationship for EmploymentHistories
-        if (this.getEmploymentHistories() != null) {
-            this.getEmploymentHistories().forEach(history -> history.setProfile(this));
-        }
-
-        // Set bidirectional relationship for PersonalDetails
-        if (this.getPersonalDetails() != null) {
-            this.getPersonalDetails().forEach(detail -> detail.setProfile(this));
-        }
-
-        // Set bidirectional relationship for IDs
-        if (this.getIds() != null) {
-            this.getIds().forEach(id -> id.setProfile(this));
-        }
-
-        // Set bidirectional relationship for References
-        if (this.getReferences() != null) {
-            this.getReferences().forEach(reference -> reference.setProfile(this));
-        }
-    }
 }

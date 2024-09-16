@@ -22,12 +22,7 @@ public class OpenAPIConfig {
                                         .bearerFormat("JWT")))
                 .info(new Info().title("API Documentation")
                         .version("1.0")
-                        .description("API documentation for your application"))
-                .paths(new Paths()
-                        .addPathItem("/api/v1/auth/logout", new PathItem().post(
-                                new Operation().summary("Logs out the user and invalidates the token")
-                        ))
-                );
+                        .description("API documentation for your application"));
     }
 }
 

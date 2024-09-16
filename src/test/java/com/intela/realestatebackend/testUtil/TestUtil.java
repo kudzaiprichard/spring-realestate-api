@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.requestResponse.AuthenticationRequest;
 import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
 import com.intela.realestatebackend.requestResponse.PasswordResetRequest;
+import com.intela.realestatebackend.requestResponse.RegisterRequest;
+import com.intela.realestatebackend.testUsers.TestUser;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,6 +34,20 @@ public class TestUtil {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());  // Logout should be successful
+    }
+
+    public static void testRegister(MockMvc mockMvc, ObjectMapper objectMapper, TestUser testUser) throws Exception{
+        // Step 1: Prepare RegisterRequest object with all required fields
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setFirstName(testUser.getFIRST_NAME());
+        registerRequest.setLastName(testUser.getLAST_NAME());
+        registerRequest.setPassword(testUser.getPASSWORD());
+        registerRequest.setEmail(testUser.getEMAIL());
+        registerRequest.setMobileNumber(testUser.getMOBILE_NUMBER());
+        registerRequest.setRole(testUser.getROLE());
+
+        // Step 2: Perform POST /register without any specific role
+        mockMvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(registerRequest))).andExpect(status().isCreated());  // Assuming successful registration returns HTTP 201
     }
 
     public static void testResetPasswordAndLogout(MockMvc mockMvc, ObjectMapper objectMapper, String accessToken, String newPassword) throws Exception {
