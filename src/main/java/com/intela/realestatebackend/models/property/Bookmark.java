@@ -16,6 +16,7 @@ import lombok.experimental.SuperBuilder;
 @Entity(name = "bookmarks")
 public class Bookmark {
     @Id
+    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
