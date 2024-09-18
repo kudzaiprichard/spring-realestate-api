@@ -7,6 +7,7 @@ import com.intela.realestatebackend.models.profile.Profile;
 import com.intela.realestatebackend.repositories.ProfileImageRepository;
 import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.UserRepository;
+import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,18 +34,18 @@ public class UserService {
     private JwtService jwtService;
     @Autowired
     private ImageService imageService;
+    @Autowired
+    private IDRepository idRepository;
 
 
     public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
-        Set<ID> ids = new HashSet<>();
-        Util.multipartFileToIDList(user.getId(), profileRepository, images, ids, imageService);
 
         // Update user details based on UpdateProfileRequest
         Profile profile = profileRepository.findByProfileOwnerId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Profile not found for user"));
-        profile.setIds(ids);
+        this.addIds(servletRequest, images);
         // Update user details based on UpdateProfileRequest
         Map<String, Object> updatedFields = Util.updateProfileFromRequest(profile, request);
 
@@ -53,6 +54,27 @@ public class UserService {
 
         // Return the updated profile response
         return Util.mapToUpdateProfileResponse(updatedFields);
+    }
+
+    public void removeIdById(HttpServletRequest servletRequest, Integer idId){
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        ID id = idRepository.findById(idId).orElseThrow(() -> new RuntimeException("ID not found"));
+        if (id.getProfile().getProfileOwner().getId().equals(user.getId())){
+            idRepository.delete(id);
+        }
+    }
+
+    public void addIds(HttpServletRequest servletRequest, MultipartFile[] images){
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        Set<ID> ids = new HashSet<>();
+        Util.multipartFileToIDList(user.getId(), profileRepository, images, ids, imageService);
+        user.getProfile().getIds().addAll(ids);
+        userRepository.save(user);
+    }
+
+    public void clearIds(HttpServletRequest servletRequest){
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        idRepository.deleteAll(user.getProfile().getIds());
     }
 
     public UpdateAccountResponse updateAccount(HttpServletRequest servletRequest, UpdateAccountRequest request) throws IllegalAccessException {

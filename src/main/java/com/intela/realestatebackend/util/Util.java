@@ -197,11 +197,6 @@ public class Util {
             updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getPersonalDetails()), request.getPersonalDetails());
         }
 
-        // Update IDs if changed
-        if (!Objects.equals(existingInfo.getIds(), request.getIds())) {
-            existingInfo.setIds(request.getIds());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getIds()), request.getIds());
-        }
 
         // Update References if changed
         if (!Objects.equals(existingInfo.getReferences(), request.getReferences())) {
