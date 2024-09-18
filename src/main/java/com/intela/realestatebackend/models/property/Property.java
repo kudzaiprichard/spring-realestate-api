@@ -29,7 +29,6 @@ import java.util.Set;
 public class Property {
 
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

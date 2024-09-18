@@ -17,7 +17,6 @@ import lombok.*;
 public class Feature {
 
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer bathrooms;

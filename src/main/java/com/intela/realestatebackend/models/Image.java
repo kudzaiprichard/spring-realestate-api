@@ -16,7 +16,6 @@ import lombok.experimental.SuperBuilder;
 public class Image {
 
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Lob

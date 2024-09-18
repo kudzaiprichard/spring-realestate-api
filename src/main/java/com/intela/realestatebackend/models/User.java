@@ -31,7 +31,6 @@ import java.util.Set;
 @Entity(name = "users")
 public class User implements UserDetails {
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String firstName;

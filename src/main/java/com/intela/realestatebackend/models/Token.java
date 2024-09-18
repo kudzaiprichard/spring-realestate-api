@@ -16,9 +16,8 @@ import lombok.*;
 public class Token {
 
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer Id;
+    private Integer id;
     private String token;
     @Enumerated(EnumType.STRING)
     private TokenType tokenType;
