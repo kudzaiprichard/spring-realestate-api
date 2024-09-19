@@ -17,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(hidden = true)
     private Integer id;
 
     @ManyToOne

@@ -22,8 +22,8 @@ import java.util.Set;
 @SuperBuilder
 public class Profile {
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(hidden = true)
     private Long id;
 
     @OneToOne
@@ -35,6 +35,60 @@ public class Profile {
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("profile-contactDetails")
     private ContactDetails contactDetails;
+
+    public void setEmergencyContacts(Set<EmergencyContact> emergencyContacts) {
+        if(this.emergencyContacts == null){
+            this.emergencyContacts = emergencyContacts;
+        } else {
+            this.emergencyContacts.clear();
+            this.emergencyContacts.addAll(emergencyContacts);
+        }
+    }
+
+    public void setResidentialHistories(Set<ResidentialHistory> residentialHistories) {
+        if(this.residentialHistories == null){
+            this.residentialHistories = residentialHistories;
+        } else {
+            this.residentialHistories.clear();
+            this.residentialHistories.addAll(residentialHistories);
+        }
+    }
+
+    public void setEmploymentHistories(Set<EmploymentHistory> employmentHistories) {
+        if(this.employmentHistories == null){
+            this.employmentHistories = employmentHistories;
+        } else {
+            this.employmentHistories.clear();
+            this.employmentHistories.addAll(employmentHistories);
+        }
+    }
+
+    public void setPersonalDetails(Set<PersonalDetails> personalDetails) {
+        if(this.personalDetails == null){
+            this.personalDetails = personalDetails;
+        } else {
+            this.personalDetails.clear();
+            this.personalDetails.addAll(personalDetails);
+        }
+    }
+
+    public void setIds(Set<ID> ids) {
+        if(this.ids == null){
+            this.ids = ids;
+        } else {
+            this.ids.clear();
+            this.ids.addAll(ids);
+        }
+    }
+
+    public void setReferences(Set<Reference> references) {
+        if(this.references == null){
+            this.references = references;
+        } else {
+            this.references.clear();
+            this.references.addAll(references);
+        }
+    }
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("profile-emergencyContacts")

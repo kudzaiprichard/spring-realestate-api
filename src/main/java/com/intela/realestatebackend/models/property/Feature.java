@@ -18,6 +18,7 @@ public class Feature {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(hidden = true)
     private Integer id;
     private Integer bathrooms;
     private Integer bedrooms;

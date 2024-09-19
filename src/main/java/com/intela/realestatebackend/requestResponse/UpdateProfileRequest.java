@@ -13,7 +13,6 @@ import lombok.experimental.SuperBuilder;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
-@Entity
 @NoArgsConstructor
 @Data
 @SuperBuilder

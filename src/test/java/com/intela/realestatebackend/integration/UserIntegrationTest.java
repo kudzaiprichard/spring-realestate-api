@@ -1,6 +1,7 @@
 package com.intela.realestatebackend.integration;
 
 import com.intela.realestatebackend.BaseTestContainerTest;
+import com.intela.realestatebackend.dto.ContactDetailsDTO;
 import com.intela.realestatebackend.models.profile.ContactDetails;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.intela.realestatebackend.requestResponse.*;
@@ -44,9 +45,9 @@ public class UserIntegrationTest extends BaseTestContainerTest {
                 .getContentAsString();
         RetrieveProfileResponse retrieveProfileResponse = objectMapper.readValue(s, RetrieveProfileResponse.class);
         assertNull(retrieveProfileResponse.getContactDetails());
-        ContactDetails contactDetails = ContactDetails.builder()
-                .contactEmail(testUserList.get(1).getEMAIL())
-                .contactNumber(testUserList.get(1).getMOBILE_NUMBER()).build();
+        ContactDetailsDTO contactDetails = new ContactDetailsDTO();
+        contactDetails.setContactEmail(testUserList.get(0).getEMAIL());
+        contactDetails.setContactNumber(testUserList.get(0).getMOBILE_NUMBER());
 
         retrieveProfileResponse.setContactDetails(contactDetails);
         s = objectMapper.writeValueAsString(retrieveProfileResponse);

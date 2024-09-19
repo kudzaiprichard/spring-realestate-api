@@ -15,8 +15,8 @@ import lombok.*;
 public class PersonalDetails {
 
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(hidden = true)
     private Long id;
 
     private String title;

@@ -13,6 +13,7 @@ import com.intela.realestatebackend.util.Util;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class UserService {
     private IDRepository idRepository;
 
 
+    @Transactional
     public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
@@ -48,8 +50,8 @@ public class UserService {
         this.addIds(servletRequest, images);
         // Update user details based on UpdateProfileRequest
         Map<String, Object> updatedFields = Util.updateProfileFromRequest(profile, request);
-
         // Save the updated user
+        profile.setRelationships();
         profileRepository.save(profile);
 
         // Return the updated profile response

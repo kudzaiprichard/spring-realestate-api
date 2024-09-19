@@ -15,8 +15,8 @@ import lombok.*;
 public class EmergencyContact {
 
     @Id
-    @Schema(hidden = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(hidden = true)
     private Long id;
 
     private String firstName;
