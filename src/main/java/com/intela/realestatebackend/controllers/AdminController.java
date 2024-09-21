@@ -67,13 +67,14 @@ public class AdminController {
             )
     )
     @PostMapping("/user-management/profiles/{userId}")
-    public ResponseEntity<UpdateProfileResponse> updateProfile(
+    public ResponseEntity<String> updateProfile(
             @PathVariable Integer userId,
             @RequestPart("images") MultipartFile[] images,
             @RequestPart("request") UpdateProfileRequest request
     ) {
         try {
-            return ResponseEntity.ok(this.adminService.updateProfile(userId, images, request));
+            this.adminService.updateProfile(userId, images, request);
+            return ResponseEntity.ok("Profile updated successfully");
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

@@ -46,13 +46,14 @@ public class UserController {
             )
     )
     @PostMapping("/profile")
-    public ResponseEntity<UpdateProfileResponse> updateProfile(
+    public ResponseEntity<String> updateProfile(
             HttpServletRequest servletRequest,
             @RequestPart("images") MultipartFile[] images,
             @RequestPart("request") UpdateProfileRequest request
     ) {
         try {
-            return ResponseEntity.ok().body(userService.updateProfile(servletRequest, images, request));
+            userService.updateProfile(servletRequest, images, request);
+            return ResponseEntity.ok().body("Profile updated successfully");
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

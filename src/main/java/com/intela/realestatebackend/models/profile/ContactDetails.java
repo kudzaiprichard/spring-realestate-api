@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class ContactDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Schema(hidden = true)
     private Long id;
 

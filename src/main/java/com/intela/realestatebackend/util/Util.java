@@ -164,47 +164,27 @@ public class Util {
         return response;
     }
 
-    public static Map<String, Object> updateProfileFromRequest(Profile existingInfo, UpdateProfileRequest request) throws IllegalAccessException {
-        Map<String, Object> updatedFields = new HashMap<>();
-
+    public static void updateProfileFromRequest(Profile existingInfo, UpdateProfileRequest request) throws IllegalAccessException {
         // Update ContactDetails if changed
-        if (!Objects.equals(existingInfo.getContactDetails(), request.getContactDetails())) {
-            existingInfo.setContactDetails(request.getContactDetails());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getContactDetails()), request.getContactDetails());
+        if (existingInfo.getContactDetails() != null) {
+            request.getContactDetails().setId(existingInfo.getContactDetails().getId());
         }
+        existingInfo.setContactDetails(request.getContactDetails());
 
         // Update EmergencyContacts if changed
-        if (!Objects.equals(existingInfo.getEmergencyContacts(), request.getEmergencyContacts())) {
-            existingInfo.setEmergencyContacts(request.getEmergencyContacts());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getEmergencyContacts()), request.getEmergencyContacts());
-        }
+        existingInfo.setEmergencyContacts(request.getEmergencyContacts());
 
         // Update ResidentialHistories if changed
-        if (!Objects.equals(existingInfo.getResidentialHistories(), request.getResidentialHistories())) {
-            existingInfo.setResidentialHistories(request.getResidentialHistories());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getResidentialHistories()), request.getResidentialHistories());
-        }
+        existingInfo.setResidentialHistories(request.getResidentialHistories());
 
         // Update EmploymentHistories if changed
-        if (!Objects.equals(existingInfo.getEmploymentHistories(), request.getEmploymentHistories())) {
-            existingInfo.setEmploymentHistories(request.getEmploymentHistories());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getEmploymentHistories()), request.getEmploymentHistories());
-        }
+        existingInfo.setEmploymentHistories(request.getEmploymentHistories());
 
         // Update PersonalDetails if changed
-        if (!Objects.equals(existingInfo.getPersonalDetails(), request.getPersonalDetails())) {
-            existingInfo.setPersonalDetails(request.getPersonalDetails());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getPersonalDetails()), request.getPersonalDetails());
-        }
-
+        existingInfo.setPersonalDetails(request.getPersonalDetails());
 
         // Update References if changed
-        if (!Objects.equals(existingInfo.getReferences(), request.getReferences())) {
-            existingInfo.setReferences(request.getReferences());
-            updatedFields.put(getQualifiedFieldName(existingInfo, existingInfo.getReferences()), request.getReferences());
-        }
-
-        return updatedFields;
+        existingInfo.setReferences(request.getReferences());
 
     }
 

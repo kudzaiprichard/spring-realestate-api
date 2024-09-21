@@ -47,7 +47,7 @@ public class AdminService {
         userRepository.deleteById(userId);
     }
 
-    public UpdateProfileResponse updateProfile(Integer userId, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
+    public void updateProfile(Integer userId, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         Profile user = profileRepository.findByProfileOwnerId(userId)
                 .orElseThrow(() -> new RuntimeException("Profile not found for user"));
         Set<ID> ids = new HashSet<>();
@@ -55,12 +55,10 @@ public class AdminService {
 
         // Update user details based on UpdateProfileRequest
         user.setIds(ids);
-        Map<String, Object> updatedFields = Util.updateProfileFromRequest(user, request);
+        Util.updateProfileFromRequest(user, request);
         // Save the updated user
         profileRepository.save(user);
 
-        // Return the updated profile response
-        return Util.mapToUpdateProfileResponse(updatedFields);
     }
 
     public UpdateAccountResponse updateAccount(Integer userId, UpdateAccountRequest request) throws IllegalAccessException {

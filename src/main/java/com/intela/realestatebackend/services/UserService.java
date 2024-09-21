@@ -40,7 +40,7 @@ public class UserService {
 
 
     @Transactional
-    public UpdateProfileResponse updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
+    public void updateProfile(HttpServletRequest servletRequest, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {
         // Find the CustomerInformation associated with the userId where propertyId is null
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
 
@@ -49,13 +49,10 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Profile not found for user"));
         this.addIds(servletRequest, images);
         // Update user details based on UpdateProfileRequest
-        Map<String, Object> updatedFields = Util.updateProfileFromRequest(profile, request);
+        Util.updateProfileFromRequest(profile, request);
         // Save the updated user
         profile.setRelationships();
         profileRepository.save(profile);
-
-        // Return the updated profile response
-        return Util.mapToUpdateProfileResponse(updatedFields);
     }
 
     public void removeIdById(HttpServletRequest servletRequest, Integer idId){

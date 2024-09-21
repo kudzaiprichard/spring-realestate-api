@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @Service
 public class ImageService {
@@ -20,7 +21,7 @@ public class ImageService {
         FileOutputStream fileOutputStream = null;
         try {
             // Create a new File object for the output path
-            File outputFile = new File(outputPath);
+            File outputFile = new File(Paths.get(outputPath, image.getName()).toString());
 
             // Create parent directories if they don't exist
             File parentDirectory = outputFile.getParentFile();
