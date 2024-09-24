@@ -3,6 +3,7 @@ package com.intela.realestatebackend.controllers;
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
 import com.intela.realestatebackend.requestResponse.BookmarkResponse;
+import com.intela.realestatebackend.requestResponse.IDImageResponse;
 import com.intela.realestatebackend.services.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.*;
@@ -92,6 +93,11 @@ public class CustomerController {
                                                     @RequestPart("request") ApplicationRequest request, @RequestPart(name = "images", required = false) MultipartFile[] images) {
         this.customerService.createApplication(propertyId, servletRequest, request, images);
         return ResponseEntity.ok("Application created");
+    }
+
+    @GetMapping(value = "/applications/images/{applicationId}")
+    public ResponseEntity<List<IDImageResponse>> getIdImagesByApplicationId(@PathVariable Integer applicationId, HttpServletRequest servletRequest) {
+        return ResponseEntity.ok(this.customerService.getIdImagesByApplicationId(applicationId, servletRequest));
     }
 
     @GetMapping("/applications")

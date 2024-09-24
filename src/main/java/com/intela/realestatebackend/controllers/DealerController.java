@@ -95,16 +95,14 @@ public class DealerController {
 
     //Todo: Endpoint should return images as a list
     @GetMapping("/property/images/{propertyId}")
-    public ResponseEntity<byte[]> fetchAllImagesByPropertyId(@PathVariable int propertyId) {
+    public ResponseEntity<List<PropertyImageResponse>> fetchAllImagesByPropertyId(@PathVariable int propertyId) {
         List<PropertyImageResponse> images = this.dealerService.fetchAllImagesByPropertyId(propertyId);
         List<byte[]> imagesByte = new ArrayList<>();
 
         images.forEach(image -> imagesByte.add(
                 image.getImage()
         ));
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.valueOf("image/jpg"))
-                .body(imagesByte.get(0));
+        return ResponseEntity.ok(images);
     }
 
     @GetMapping("/property/{propertyId}")

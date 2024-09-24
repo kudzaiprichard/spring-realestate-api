@@ -1,8 +1,7 @@
 package com.intela.realestatebackend.util;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.intela.realestatebackend.exceptions.MissingAccessTokenException;
+import com.intela.realestatebackend.models.Image;
 import com.intela.realestatebackend.models.ProfileImage;
 import com.intela.realestatebackend.models.User;
 import com.intela.realestatebackend.models.profile.ID;
@@ -18,8 +17,6 @@ import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.ImageService;
 import com.intela.realestatebackend.services.JwtService;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +27,32 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 @RequiredArgsConstructor
 public class Util {
+
+    public static void toFullImage(Image image){
+        if (image.getImage() != null)
+            image.setImage(decompressImage(image.getImage()));
+        else {
+            try {
+                image.setImage(Util.readFileToBytes(Paths.get(image.getPath(), image.getName()).toString()));
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot retrieve profile image" + e);
+            }
+        }
+    }
+
+    public static byte[] readFileToBytes(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
 
     public static User getUserByToken(HttpServletRequest request, JwtService jwtService, UserRepository userRepository) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -113,9 +130,11 @@ public class Util {
         List<PropertyImage> propertyImages = propertyImageRepository.findAllByPropertyId(propertyId);
 
         propertyImages.forEach(
-                propertyImage -> propertyImageResponses.add(
-                        new PropertyImageResponse(propertyImage)
-                )
+                propertyImage -> {
+                    PropertyImageResponse profileImageResponse = new PropertyImageResponse(propertyImage);
+                    Util.toFullImage(profileImageResponse);
+                    propertyImageResponses.add(profileImageResponse);
+                }
         );
 
         return propertyImageResponses;
@@ -139,19 +158,23 @@ public class Util {
         if (propertyImage == null || propertyImage.getImage() == null) {
             return null;
         }
-        return new PropertyImageResponse(propertyImage);
+        PropertyImageResponse propertyImageResponse = new PropertyImageResponse(propertyImage);
+        Util.toFullImage(propertyImageResponse);
+        return propertyImageResponse;
+    }
+
+    public static IDImageResponse convertFromIDImageToImageResponse(ID id) {
+        if (id == null || id.getImage() == null) {
+            return null;
+        }
+        IDImageResponse idImageResponse = new IDImageResponse(id);
+        Util.toFullImage(idImageResponse);
+        return idImageResponse;
     }
 
     public static RetrieveProfileResponse mapToRetrieveProfileResponse(Profile user) {
         // Implement mapping logic here
         return new RetrieveProfileResponse(user);
-    }
-
-    public static UpdateProfileResponse mapToUpdateProfileResponse(Map<String, Object> updatedFields) {
-        // Implement mapping logic here
-        UpdateProfileResponse response = new UpdateProfileResponse();
-        response.setUpdatedFields(updatedFields);
-        return response;
     }
 
     public static RetrieveAccountResponse mapToRetrieveAccountResponse(User user) {
@@ -271,106 +294,6 @@ public class Util {
 
     public static ApplicationResponse mapApplicationToApplicationResponse(Application application) {
         return new ApplicationResponse(application);
-    }
-
-    /**
-     * Recursively searches through an entity and its child entities, merging every detached child entity.
-     * Uses reflection to find fields that represent child entities, guided by @JsonManagedReference and @JsonBackReference.
-     * If neither annotation is present, it assumes the field is a child if it's an @Entity or a collection of @Entity.
-     *
-     * @param <T>           The type of the root entity.
-     * @param entityManager The EntityManager to manage the persistence context.
-     * @param entity        The root entity.
-     * @return The merged root entity.
-     */
-    public static <T> T recursiveMerge(EntityManager entityManager, T entity) {
-        // Perform BFS using a queue to traverse the entity tree
-        Queue<Object> queue = new LinkedList<>();
-        queue.add(entity);
-
-        while (!queue.isEmpty()) {
-            Object currentEntity = queue.poll();
-
-            // Check if the current entity is detached, and merge if necessary
-            if (!entityManager.contains(currentEntity)) {
-                currentEntity = entityManager.merge(currentEntity);  // Reattach the entity
-            }
-
-            // Find and add child entities to the queue
-            List<Object> childEntities = findChildEntities(currentEntity);
-            if (childEntities != null) {
-                queue.addAll(childEntities);
-            }
-        }
-
-        return entity; // Return the root entity (now attached)
-    }
-
-    /**
-     * Uses reflection to find child entities in the given entity.
-     * It looks for fields that are either @JsonManagedReference (indicating children),
-     * or @Entity-annotated types, or collections of @Entity-annotated types.
-     * <p>
-     * Fields with @JsonBackReference (indicating parents) are ignored to prevent recursion.
-     *
-     * @param entity The parent entity.
-     * @return List of child entities or an empty list if no children are found.
-     */
-    public static List<Object> findChildEntities(Object entity) {
-        List<Object> childEntities = new LinkedList<>();
-
-        // Get all fields of the entity
-        Field[] fields = entity.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-
-            try {
-                // Ignore fields annotated with @JsonBackReference (they indicate parent relations)
-                if (field.isAnnotationPresent(JsonBackReference.class)) {
-                    continue;
-                }
-
-                Object fieldValue = field.get(entity);
-
-                if (fieldValue != null) {
-                    // If the field is annotated with @JsonManagedReference (child relation)
-                    if (field.isAnnotationPresent(JsonManagedReference.class)) {
-                        childEntities.add(fieldValue);
-                    }
-
-                    // If the field itself is an entity (child entity)
-                    else if (isEntity(field.getType())) {
-                        childEntities.add(fieldValue);
-                    }
-
-                    // If the field is a collection (e.g., List or Set) of entities
-                    else if (Collection.class.isAssignableFrom(field.getType())) {
-                        Collection<?> collection = (Collection<?>) fieldValue;
-
-                        for (Object item : collection) {
-                            if (isEntity(item.getClass())) {
-                                childEntities.add(item);
-                            }
-                        }
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();  // Handle the exception as necessary
-            }
-        }
-
-        return childEntities;
-    }
-
-    /**
-     * Checks if the given class is annotated with @Entity.
-     *
-     * @param clazz The class to check.
-     * @return true if the class is annotated with @Entity, false otherwise.
-     */
-    public static boolean isEntity(Class<?> clazz) {
-        return clazz.isAnnotationPresent(Entity.class);
     }
 
     public static ProfileImage multipartFileToProfileImage(User user, MultipartFile image, ImageService imageService) throws IOException {

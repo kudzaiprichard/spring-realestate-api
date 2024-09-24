@@ -6,6 +6,7 @@ import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
+import com.intela.realestatebackend.models.property.PropertyImage;
 import com.intela.realestatebackend.repositories.BookmarkRepository;
 import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;
@@ -15,6 +16,7 @@ import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.ApplicationRequest;
 import com.intela.realestatebackend.requestResponse.ApplicationResponse;
 import com.intela.realestatebackend.requestResponse.BookmarkResponse;
+import com.intela.realestatebackend.requestResponse.IDImageResponse;
 import com.intela.realestatebackend.util.Util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -181,5 +183,12 @@ public class CustomerService {
 
         // Delete the CustomerInformation (withdraw the application)
         this.applicationRepository.delete(application);
+    }
+
+    public List<IDImageResponse> getIdImagesByApplicationId(Integer applicationId, HttpServletRequest servletRequest) {
+        List<IDImageResponse> idImageResponses = idRepository.findAllByProfileId(applicationId);
+        return idImageResponses.stream()
+                .map(Util::convertFromIDImageToImageResponse) // Assuming ImageResponse has a constructor that takes a PropertyImage
+                .collect(Collectors.toList());
     }
 }

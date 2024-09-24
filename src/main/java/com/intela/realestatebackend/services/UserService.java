@@ -17,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.intela.realestatebackend.util.Util.decompressImage;
 import static com.intela.realestatebackend.util.Util.getUserByToken;
 
 @Service
@@ -100,7 +102,9 @@ public class UserService {
     public ProfileImageResponse getProfileImage(HttpServletRequest servletRequest) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         ProfileImage image = profileImageRepository.findByUserId(user.getId());
-        return new ProfileImageResponse(image);
+        ProfileImageResponse profileImageResponse = new ProfileImageResponse(image);
+        Util.toFullImage(profileImageResponse);
+        return profileImageResponse;
     }
 
     public void updateProfileImage(HttpServletRequest servletRequest, MultipartFile image) throws IOException {
