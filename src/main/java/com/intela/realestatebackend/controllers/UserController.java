@@ -59,6 +59,26 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "Uploads profile image",
+            description = "Uploads profile image",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            encoding = {
+                                    @Encoding(name = "image", contentType = "image/png, image/jpeg")
+                            },
+                            mediaType = "multipart/form-data",
+                            schemaProperties =
+                                    {
+                                            @SchemaProperty(
+                                                    name = "images",
+                                                    schema = @Schema(type = "string", format = "binary")
+                                            )
+                                    }
+
+                    )
+            )
+    )
     @PostMapping("/profile/avatar")
     public ResponseEntity<String> updateProfileImage(
             HttpServletRequest servletRequest,

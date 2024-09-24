@@ -16,6 +16,7 @@ public class ImageService {
     private String imageStorageDirectory; // Define your storage directory
 
     public void storeImage(Image image) throws IOException {
+        System.out.println("Current working directory: " + new File(".").getAbsolutePath());
         String outputPath = imageStorageDirectory;
         byte[] imageBytes = image.getImage();
         FileOutputStream fileOutputStream = null;

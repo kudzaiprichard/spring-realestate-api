@@ -9,10 +9,20 @@ import com.intela.realestatebackend.testUsers.TestUser;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TestUtil {
+    public static final String TEST_IMAGE_PATH = "/usr/src/files/images";
+    public static byte[] readFileToBytes(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
     public static AuthenticationResponse testLogin(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception {
         AuthenticationRequest authRequest = new AuthenticationRequest();
         authRequest.setEmail(email);

@@ -11,14 +11,15 @@ spring:
     hibernate:
       ddl-auto: create-drop
     generate-ddl: true
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
     database: MySQL
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql_realestate:3306/realestate
+    databaseName: realestate
+    url: jdbc:mysql://mysql_realestate:3306/${spring.datasource.databaseName}
     username: root
     password:
 
