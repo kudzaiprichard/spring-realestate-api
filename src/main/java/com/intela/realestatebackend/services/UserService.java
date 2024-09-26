@@ -19,8 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.intela.realestatebackend.util.Util.decompressImage;
 import static com.intela.realestatebackend.util.Util.getUserByToken;
@@ -117,5 +119,16 @@ public class UserService {
     public RetrieveAccountResponse retrieveAccount(HttpServletRequest servletRequest) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         return new RetrieveAccountResponse(user);
+    }
+
+    public List<IDImageResponse> getIdImagesByUserId(HttpServletRequest servletRequest) {
+        User user = getUserByToken(servletRequest, jwtService, this.userRepository);
+        Profile profile = profileRepository.findByProfileOwnerId(user.getId()).orElseThrow(
+                () -> new RuntimeException("Profile not found")
+        );
+        List<ID> idImageResponses = idRepository.findAllByProfileId(Math.toIntExact(profile.getId()));
+        return idImageResponses.stream()
+                .map(Util::convertFromIDImageToImageResponse) // Assuming ImageResponse has a constructor that takes a PropertyImage
+                .collect(Collectors.toList());
     }
 }

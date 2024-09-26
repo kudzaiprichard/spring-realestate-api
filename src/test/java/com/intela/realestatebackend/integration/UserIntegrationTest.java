@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.integration;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.intela.realestatebackend.BaseTestContainerTest;
 import com.intela.realestatebackend.dto.ContactDetailsDTO;
 import com.intela.realestatebackend.models.profile.ContactDetails;
@@ -128,10 +129,19 @@ public class UserIntegrationTest extends BaseTestContainerTest {
                 .getContentAsString();
         RetrieveProfileResponse retrieveProfileResponse2 = objectMapper.readValue(s, RetrieveProfileResponse.class);
 
+        s = mockMvc.perform(get("/api/v1/admin/user-management/profiles/images")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        List<IDImageResponse> idImageResponses = objectMapper.readValue(s, new TypeReference<>() {
+        });
+
         assertEquals(retrieveProfileResponse2.getContactDetails().getContactEmail(), contactDetails.getContactEmail());
         assertEquals(retrieveProfileResponse2.getContactDetails().getContactNumber(), contactDetails.getContactNumber());
 
-        retrieveProfileResponse2.getIds().forEach(id -> {
+        idImageResponses.forEach(id -> {
             if (id.getName().equals("image1.jpg")) {
                 assertThat(id.getImage().length).isGreaterThan(0);
                 assertThat(id.getImage()).isEqualTo(image1Bytes);

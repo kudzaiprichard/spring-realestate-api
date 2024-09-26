@@ -8,6 +8,7 @@ import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.intela.realestatebackend.util.Util.getUserByToken;
 
 @Service
 @RequiredArgsConstructor
@@ -93,6 +96,16 @@ public class AdminService {
 
         // Save the updated user back to the repository
         userRepository.save(user);
+    }
+
+    public List<IDImageResponse> getIdImagesByUserId(Integer userId, HttpServletRequest servletRequest) {
+        Profile profile = profileRepository.findByProfileOwnerId(userId).orElseThrow(
+                () -> new RuntimeException("Profile not found")
+        );
+        List<ID> idImageResponses = idRepository.findAllByProfileId(Math.toIntExact(profile.getId()));
+        return idImageResponses.stream()
+                .map(Util::convertFromIDImageToImageResponse) // Assuming ImageResponse has a constructor that takes a PropertyImage
+                .collect(Collectors.toList());
     }
     // Helper methods for mapping and updating
 

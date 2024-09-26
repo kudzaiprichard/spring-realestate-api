@@ -4,6 +4,7 @@ import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.services.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +79,11 @@ public class AdminController {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @GetMapping(value = "/user-management/profiles/ids/{userId}")
+    public ResponseEntity<List<IDImageResponse>> getIdImagesByUserId(@PathVariable Integer userId, HttpServletRequest servletRequest) {
+        return ResponseEntity.ok(this.adminService.getIdImagesByUserId(userId, servletRequest));
     }
 
     @PostMapping("/user-management/{userId}")
