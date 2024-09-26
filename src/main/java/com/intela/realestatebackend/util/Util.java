@@ -37,7 +37,7 @@ import java.util.zip.Inflater;
 @RequiredArgsConstructor
 public class Util {
 
-    public static void toFullImage(Image image){
+    public static void toFullImage(Image image) {
         if (image.getImage() != null)
             image.setImage(decompressImage(image.getImage()));
         else {

@@ -3,10 +3,6 @@ package com.intela.realestatebackend.integration;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intela.realestatebackend.BaseTestContainerTest;
 import com.intela.realestatebackend.dto.ContactDetailsDTO;
-import com.intela.realestatebackend.models.profile.ContactDetails;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.testUsers.TestUser;
 import com.intela.realestatebackend.testUtil.TestUtil;
@@ -23,8 +19,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserIntegrationTest extends BaseTestContainerTest {
     @Autowired
     private List<TestUser> testUserList;
+
     @Test
     @Order(1)
     void shouldRegisterUser() throws Exception {
@@ -48,7 +46,7 @@ public class UserIntegrationTest extends BaseTestContainerTest {
 
         String accessToken = authenticationResponse.getAccessToken();
         String s = mockMvc.perform(get("/api/v1/user/profile")
-                .header("Authorization", "Bearer " + accessToken))
+                        .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

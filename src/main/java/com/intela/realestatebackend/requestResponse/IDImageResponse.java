@@ -10,11 +10,13 @@ import org.springframework.beans.BeanUtils;
 @Data
 @SuperBuilder
 public class IDImageResponse extends ID {
+    private Long profileId;
+
     public IDImageResponse(ID id) {
-        BeanUtils.copyProperties(id,this);
+        BeanUtils.copyProperties(id, this);
         init();
     }
-    private Long profileId;
+
     private void init() {
         this.profileId = this.getProfile() != null ? this.getProfile().getId() : null;
     }

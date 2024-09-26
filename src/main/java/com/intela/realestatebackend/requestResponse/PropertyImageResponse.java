@@ -10,12 +10,12 @@ import org.springframework.beans.BeanUtils;
 @Data
 @SuperBuilder
 public class PropertyImageResponse extends PropertyImage {
+    private Integer propertyId;
+
     public PropertyImageResponse(PropertyImage propertyImage) {
         BeanUtils.copyProperties(propertyImage, this);
         init();
     }
-
-    private Integer propertyId;
 
     private void init() {
         this.propertyId = this.getProperty() != null ? this.getProperty().getId() : null;

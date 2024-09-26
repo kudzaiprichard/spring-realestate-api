@@ -19,10 +19,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class TestUtil {
     public static final String TEST_IMAGE_PATH = "/usr/src/files/images";
+
     public static byte[] readFileToBytes(String filePath) throws IOException {
         Path path = Paths.get(filePath);
         return Files.readAllBytes(path);
     }
+
     public static AuthenticationResponse testLogin(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception {
         AuthenticationRequest authRequest = new AuthenticationRequest();
         authRequest.setEmail(email);
@@ -46,7 +48,7 @@ public class TestUtil {
                 .andExpect(status().isOk());  // Logout should be successful
     }
 
-    public static void testRegister(MockMvc mockMvc, ObjectMapper objectMapper, TestUser testUser) throws Exception{
+    public static void testRegister(MockMvc mockMvc, ObjectMapper objectMapper, TestUser testUser) throws Exception {
         // Step 1: Prepare RegisterRequest object with all required fields
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setFirstName(testUser.getFIRST_NAME());

@@ -6,7 +6,6 @@ import com.intela.realestatebackend.models.profile.ID;
 import com.intela.realestatebackend.models.property.Application;
 import com.intela.realestatebackend.models.property.Bookmark;
 import com.intela.realestatebackend.models.property.Property;
-import com.intela.realestatebackend.models.property.PropertyImage;
 import com.intela.realestatebackend.repositories.BookmarkRepository;
 import com.intela.realestatebackend.repositories.ProfileRepository;
 import com.intela.realestatebackend.repositories.PropertyRepository;

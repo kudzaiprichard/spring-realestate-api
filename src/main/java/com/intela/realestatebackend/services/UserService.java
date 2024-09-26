@@ -17,14 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.intela.realestatebackend.util.Util.decompressImage;
 import static com.intela.realestatebackend.util.Util.getUserByToken;
 
 @Service
@@ -59,15 +57,15 @@ public class UserService {
         profileRepository.save(profile);
     }
 
-    public void removeIdById(HttpServletRequest servletRequest, Integer idId){
+    public void removeIdById(HttpServletRequest servletRequest, Integer idId) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         ID id = idRepository.findById(idId).orElseThrow(() -> new RuntimeException("ID not found"));
-        if (id.getProfile().getProfileOwner().getId().equals(user.getId())){
+        if (id.getProfile().getProfileOwner().getId().equals(user.getId())) {
             idRepository.delete(id);
         }
     }
 
-    public void addIds(HttpServletRequest servletRequest, MultipartFile[] images){
+    public void addIds(HttpServletRequest servletRequest, MultipartFile[] images) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         Set<ID> ids = new HashSet<>();
         Util.multipartFileToIDList(user.getId(), profileRepository, images, ids, imageService);
@@ -75,7 +73,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void clearIds(HttpServletRequest servletRequest){
+    public void clearIds(HttpServletRequest servletRequest) {
         User user = getUserByToken(servletRequest, jwtService, this.userRepository);
         idRepository.deleteAll(user.getProfile().getIds());
     }

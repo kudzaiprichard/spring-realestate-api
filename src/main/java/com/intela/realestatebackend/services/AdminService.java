@@ -21,22 +21,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.intela.realestatebackend.util.Util.getUserByToken;
-
 @Service
 @RequiredArgsConstructor
 public class AdminService {
 
     @Autowired
+    private final ImageService imageService;
+    @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private ProfileRepository profileRepository;
     @Autowired
     private IDRepository idRepository;
-
-    @Autowired
-    private final ImageService imageService;
 
     public List<RetrieveProfileResponse> listAllProfiles() {
         // Retrieve profiles where property_id is null

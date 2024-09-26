@@ -21,6 +21,10 @@ import java.sql.SQLException;
 public class BaseTestContainerTest {
 
     private static MySQLContainer<?> mysqlContainer;
+    @Autowired
+    protected MockMvc mockMvc;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @BeforeAll
     public static void setUp() {
@@ -40,8 +44,8 @@ public class BaseTestContainerTest {
     }
 
     @AfterAll
-    public static void tearDown(){
-        if (mysqlContainer != null && mysqlContainer.isRunning()){
+    public static void tearDown() {
+        if (mysqlContainer != null && mysqlContainer.isRunning()) {
             mysqlContainer.stop();
         }
     }
@@ -56,12 +60,6 @@ public class BaseTestContainerTest {
             return false;
         }
     }
-
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
 
     @Test
     void test() {

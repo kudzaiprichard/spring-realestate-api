@@ -7,7 +7,6 @@ import jakarta.persistence.InheritanceType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

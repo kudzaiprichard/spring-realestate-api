@@ -190,22 +190,22 @@ public class AuthService {
     }
 
     public RetrieveAccountResponse getUserByAccessToken(String accessToken) {
-        if (accessToken == null){
+        if (accessToken == null) {
             throw new MissingAccessTokenException("Missing access token");
         }
         User user = tokenRepository.findUserByAccessToken(accessToken);
-        if (user == null){
+        if (user == null) {
             throw new MissingAccessTokenException("Missing access token");
         }
         return Util.mapToRetrieveAccountResponse(user);
     }
 
     public RetrieveAccountResponse getUserByRefreshToken(String refreshToken) {
-        if (refreshToken == null){
+        if (refreshToken == null) {
             throw new MissingRefreshTokenException("Missing refresh token");
         }
         User user = tokenRepository.findUserByRefreshToken(refreshToken);
-        if (user == null){
+        if (user == null) {
             throw new MissingRefreshTokenException("Missing refresh token");
         }
         return Util.mapToRetrieveAccountResponse(user);

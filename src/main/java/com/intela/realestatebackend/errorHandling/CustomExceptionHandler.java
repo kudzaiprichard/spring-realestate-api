@@ -16,10 +16,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<String> onMissingAccessTokenException(MissingAccessTokenException exception) {
         return ResponseEntity.status(403).body("Missing access token" + exception.getMessage());
     }
+
     @ExceptionHandler(MissingRefreshTokenException.class)
     public ResponseEntity<String> onMissingRefreshTokenException(MissingRefreshTokenException exception) {
         return ResponseEntity.status(403).body("Missing refresh token" + exception.getMessage());
     }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ProblemDetail onNotFoundException(EntityNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());

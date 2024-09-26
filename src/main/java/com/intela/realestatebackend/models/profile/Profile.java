@@ -35,9 +35,27 @@ public class Profile {
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("profile-contactDetails")
     private ContactDetails contactDetails;
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("profile-emergencyContacts")
+    private Set<EmergencyContact> emergencyContacts;
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("profile-residentialHistories")
+    private Set<ResidentialHistory> residentialHistories;
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("profile-employmentHistories")
+    private Set<EmploymentHistory> employmentHistories;
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("profile-personalDetails")
+    private PersonalDetails personalDetails;
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("profile-ids")
+    private Set<ID> ids = new HashSet<>();
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("profile-references")
+    private Set<Reference> references;
 
     public void setEmergencyContacts(Set<EmergencyContact> emergencyContacts) {
-        if(this.emergencyContacts == null){
+        if (this.emergencyContacts == null) {
             this.emergencyContacts = emergencyContacts;
         } else {
             this.emergencyContacts.clear();
@@ -46,7 +64,7 @@ public class Profile {
     }
 
     public void setResidentialHistories(Set<ResidentialHistory> residentialHistories) {
-        if(this.residentialHistories == null){
+        if (this.residentialHistories == null) {
             this.residentialHistories = residentialHistories;
         } else {
             this.residentialHistories.clear();
@@ -55,7 +73,7 @@ public class Profile {
     }
 
     public void setEmploymentHistories(Set<EmploymentHistory> employmentHistories) {
-        if(this.employmentHistories == null){
+        if (this.employmentHistories == null) {
             this.employmentHistories = employmentHistories;
         } else {
             this.employmentHistories.clear();
@@ -64,7 +82,7 @@ public class Profile {
     }
 
     public void setIds(Set<ID> ids) {
-        if(this.ids == null){
+        if (this.ids == null) {
             this.ids = ids;
         } else {
             this.ids.clear();
@@ -73,37 +91,13 @@ public class Profile {
     }
 
     public void setReferences(Set<Reference> references) {
-        if(this.references == null){
+        if (this.references == null) {
             this.references = references;
         } else {
             this.references.clear();
             this.references.addAll(references);
         }
     }
-
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("profile-emergencyContacts")
-    private Set<EmergencyContact> emergencyContacts;
-
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("profile-residentialHistories")
-    private Set<ResidentialHistory> residentialHistories;
-
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("profile-employmentHistories")
-    private Set<EmploymentHistory> employmentHistories;
-
-    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("profile-personalDetails")
-    private PersonalDetails personalDetails;
-
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("profile-ids")
-    private Set<ID> ids = new HashSet<>();
-
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("profile-references")
-    private Set<Reference> references;
 
     @PrePersist
     @PreUpdate

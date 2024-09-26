@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-public class TestUserAdmin extends TestUser{
+public class TestUserAdmin extends TestUser {
     private final String FIRST_NAME = "Bob";
     private final String LAST_NAME = "The Builder";
     private final String EMAIL = "bob@gmail.com";

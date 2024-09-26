@@ -14,16 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -31,18 +28,18 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
     @Autowired
     private List<TestUser> testUserList;
 
-    private List<TestUser> adminUsers = new ArrayList<>();
-    private List<TestUser> customerUsers = new ArrayList<>();
+    private final List<TestUser> adminUsers = new ArrayList<>();
+    private final List<TestUser> customerUsers = new ArrayList<>();
 
     @Test
     @Order(1)
     void shouldRegisterUser() throws Exception {
         for (TestUser user : testUserList) {
-            if (user.getROLE().equals(Role.ADMIN)){
+            if (user.getROLE().equals(Role.ADMIN)) {
                 TestUtil.testRegister(mockMvc, objectMapper, user);
                 adminUsers.add(user);
             }
-            if (user.getROLE().equals(Role.CUSTOMER)){
+            if (user.getROLE().equals(Role.CUSTOMER)) {
                 TestUtil.testRegister(mockMvc, objectMapper, user);
                 customerUsers.add(user);
             }
@@ -75,8 +72,8 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
         String customerAccessToken = customerAuthResponse.getAccessToken();
 
         String s = mockMvc.perform(
-                get("/api/v1/user/")
-                        .header("Authorization", "Bearer " + adminAccessToken))
+                        get("/api/v1/user/")
+                                .header("Authorization", "Bearer " + adminAccessToken))
                 .andExpect(status().isOk()
                 ).andReturn().getResponse().getContentAsString();
         User admin = objectMapper.readValue(s, User.class);
