@@ -63,15 +63,6 @@ public class Profile {
         }
     }
 
-    public void setPersonalDetails(Set<PersonalDetails> personalDetails) {
-        if(this.personalDetails == null){
-            this.personalDetails = personalDetails;
-        } else {
-            this.personalDetails.clear();
-            this.personalDetails.addAll(personalDetails);
-        }
-    }
-
     public void setIds(Set<ID> ids) {
         if(this.ids == null){
             this.ids = ids;
@@ -102,9 +93,9 @@ public class Profile {
     @JsonManagedReference("profile-employmentHistories")
     private Set<EmploymentHistory> employmentHistories;
 
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("profile-personalDetails")
-    private Set<PersonalDetails> personalDetails;
+    private PersonalDetails personalDetails;
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("profile-ids")
@@ -139,7 +130,7 @@ public class Profile {
 
         // Set bidirectional relationship for PersonalDetails
         if (this.getPersonalDetails() != null) {
-            this.getPersonalDetails().forEach(detail -> detail.setProfile(this));
+            this.getPersonalDetails().setProfile(this);
         }
 
         // Set bidirectional relationship for IDs

@@ -25,7 +25,7 @@ public class PersonalDetails {
     private String lastName;
     private String dob;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "profile_id")
     @Schema(hidden = true)
     @JsonBackReference("profile-personalDetails")
