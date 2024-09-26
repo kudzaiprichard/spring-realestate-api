@@ -185,6 +185,6 @@ public class AuthIntegrationTest extends BaseTestContainerTest {
         assertEquals(testUserList.get(0).getFIRST_NAME(), loggedUserResponse.getFirstName());
         assertEquals(testUserList.get(0).getFIRST_NAME(), retrieveAccountResponseFromRefreshToken.getFirstName());
         assertEquals(testUserList.get(0).getFIRST_NAME(), retrieveAccountResponseFromAccessToken.getFirstName());
-
+        TestUtil.testLogout(mockMvc, accessToken);
     }
 }

@@ -42,7 +42,9 @@ public class UserIntegrationTest extends BaseTestContainerTest {
     @Order(2)
     void shouldUserUpdateProfile() throws Exception {
         AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, testUserList.get(0).getEMAIL(), testUserList.get(0).getPASSWORD());
-        byte[] imageBytes = TestUtil.readFileToBytes(Paths.get(TestUtil.TEST_IMAGE_PATH, "image1.jpg").toString());
+        byte[] image1Bytes = TestUtil.readFileToBytes(Paths.get(TestUtil.TEST_IMAGE_PATH, "image1.jpg").toString());
+        byte[] image2Bytes = TestUtil.readFileToBytes(Paths.get(TestUtil.TEST_IMAGE_PATH, "image2.jpg").toString());
+
         String accessToken = authenticationResponse.getAccessToken();
         String s = mockMvc.perform(get("/api/v1/user/profile")
                 .header("Authorization", "Bearer " + accessToken))
@@ -69,7 +71,7 @@ public class UserIntegrationTest extends BaseTestContainerTest {
                 "images",                // Part name (matching @RequestPart name)
                 "image1.jpg",            // Filename
                 "image/jpeg",            // Content type
-                imageBytes // File content
+                image1Bytes // File content
         );
         mockMvc.perform(multipart("/api/v1/user/profile")
                         .file(image1)
@@ -103,10 +105,17 @@ public class UserIntegrationTest extends BaseTestContainerTest {
                 "images",                // Part name (matching @RequestPart name)
                 "image1.jpg",            // Filename
                 "image/jpeg",            // Content type
-                imageBytes // File content
+                image1Bytes // File content
+        );
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",                // Part name (matching @RequestPart name)
+                "image2.jpg",            // Filename
+                "image/jpeg",            // Content type
+                image2Bytes // File content
         );
         mockMvc.perform(multipart("/api/v1/user/profile")
                         .file(image1)
+                        .file(image2)
                         .file(requestPart)
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());
@@ -118,9 +127,20 @@ public class UserIntegrationTest extends BaseTestContainerTest {
                 .getResponse()
                 .getContentAsString();
         RetrieveProfileResponse retrieveProfileResponse2 = objectMapper.readValue(s, RetrieveProfileResponse.class);
+
         assertEquals(retrieveProfileResponse2.getContactDetails().getContactEmail(), contactDetails.getContactEmail());
         assertEquals(retrieveProfileResponse2.getContactDetails().getContactNumber(), contactDetails.getContactNumber());
 
+        retrieveProfileResponse2.getIds().forEach(id -> {
+            if (id.getName().equals("image1.jpg")) {
+                assertThat(id.getImage().length).isGreaterThan(0);
+                assertThat(id.getImage()).isEqualTo(image1Bytes);
+            }
+            if (id.getName().equals("image2.jpg")) {
+                assertThat(id.getImage().length).isGreaterThan(0);
+                assertThat(id.getImage()).isEqualTo(image2Bytes);
+            }
+        });
 
         TestUtil.testLogout(mockMvc, accessToken);
     }
@@ -155,5 +175,194 @@ public class UserIntegrationTest extends BaseTestContainerTest {
         // 3. Assert that the uploaded and retrieved images have the same bytes
         assertThat(retrievedImageBytes.length).isGreaterThan(0);
         assertThat(retrievedImageBytes).isEqualTo(imageBytes);
+        TestUtil.testLogout(mockMvc, accessToken);
+    }
+
+    @Test
+    @Order(4)
+    void shouldUserUpdateAccountInfo() throws Exception {
+        AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, testUserList.get(0).getEMAIL(), testUserList.get(0).getPASSWORD());
+        String accessToken = authenticationResponse.getAccessToken();
+
+        String s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        RetrieveAccountResponse retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+
+        UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest(
+                retrieveAccountResponse.getFirstName(),
+                retrieveAccountResponse.getLastName(),
+                retrieveAccountResponse.getMobileNumber(),
+                testUserList.get(1).getEMAIL()
+        );
+        mockMvc.perform(post("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(1).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+        TestUtil.testLogout(mockMvc, accessToken);
+    }
+
+    @Test
+    @Order(5)
+    void shouldUserUpdateAccountInfo1() throws Exception {
+        AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, testUserList.get(0).getEMAIL(), testUserList.get(0).getPASSWORD());
+        String accessToken = authenticationResponse.getAccessToken();
+
+        String s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        RetrieveAccountResponse retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+
+        UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest(
+                testUserList.get(1).getFIRST_NAME(),
+                retrieveAccountResponse.getLastName(),
+                retrieveAccountResponse.getMobileNumber(),
+                retrieveAccountResponse.getEmail()
+        );
+        mockMvc.perform(post("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(1).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+        TestUtil.testLogout(mockMvc, accessToken);
+    }
+
+    @Test
+    @Order(6)
+    void shouldUserUpdateAccountInfo2() throws Exception {
+        AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, testUserList.get(0).getEMAIL(), testUserList.get(0).getPASSWORD());
+        String accessToken = authenticationResponse.getAccessToken();
+
+        String s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        RetrieveAccountResponse retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+
+        UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest(
+                retrieveAccountResponse.getFirstName(),
+                testUserList.get(1).getLAST_NAME(),
+                retrieveAccountResponse.getMobileNumber(),
+                retrieveAccountResponse.getEmail()
+        );
+        mockMvc.perform(post("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(1).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+        TestUtil.testLogout(mockMvc, accessToken);
+    }
+
+    @Test
+    @Order(7)
+    void shouldUserUpdateAccountInfo3() throws Exception {
+        AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, testUserList.get(0).getEMAIL(), testUserList.get(0).getPASSWORD());
+        String accessToken = authenticationResponse.getAccessToken();
+
+        String s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        RetrieveAccountResponse retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(0).getMOBILE_NUMBER());
+
+
+        UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest(
+                retrieveAccountResponse.getFirstName(),
+                retrieveAccountResponse.getLastName(),
+                testUserList.get(1).getMOBILE_NUMBER(),
+                retrieveAccountResponse.getEmail()
+        );
+        mockMvc.perform(post("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        s = mockMvc.perform(get("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        retrieveAccountResponse = objectMapper.readValue(s, RetrieveAccountResponse.class);
+        assertEquals(retrieveAccountResponse.getFirstName(), testUserList.get(0).getFIRST_NAME());
+        assertEquals(retrieveAccountResponse.getLastName(), testUserList.get(0).getLAST_NAME());
+        assertEquals(retrieveAccountResponse.getEmail(), testUserList.get(0).getEMAIL());
+        assertEquals(retrieveAccountResponse.getMobileNumber(), testUserList.get(1).getMOBILE_NUMBER());
+
+        TestUtil.testLogout(mockMvc, accessToken);
     }
 }
