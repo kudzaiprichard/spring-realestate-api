@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
@@ -138,16 +138,15 @@
                 <executions>
                     <execution>
                         <id>create-archive</id>
-                        <phase>verify</phase> <!-- Package everything during the package phase -->
+                        <phase>install</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <!-- Descriptor for what to include in the assembly -->
                                 <descriptor>src/assembly/src-assembly.xml</descriptor>
                             </descriptors>
-                            <finalName>realestate-backend-all-in-one</finalName> <!-- Name of the final archive -->
+                            <finalName>realestate-backend-all-in-one</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
@@ -161,17 +160,17 @@
                 <version>3.0.0-M1</version>
                 <executions>
                     <execution>
-                        <phase>install</phase> <!-- Install the archive during the install phase -->
+                        <phase>install</phase>
                         <goals>
                             <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <file>${project.build.directory}/realestate-backend-all-in-one.jar</file> <!-- Path to the archive -->
+                            <file>${project.build.directory}/realestate-backend-all-in-one.jar</file>
                             <groupId>com.intela</groupId>
                             <artifactId>realestate-backend</artifactId>
                             <version>${project.version}</version>
-                            <packaging>jar</packaging> <!-- Packaging format -->
-                            <classifier>all-in-one</classifier> <!-- Classifier to differentiate the archive -->
+                            <packaging>jar</packaging>
+                            <classifier>all-in-one</classifier>
                         </configuration>
                     </execution>
                 </executions>
@@ -180,7 +179,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.2</version>
+                <configuration>
+                    <mainClass>com.intela.realestatebackend.RealestateBackendApplication</mainClass>
+                    <layout>JAR</layout>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -194,12 +203,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
             </plugin>
 
             <plugin>
@@ -229,15 +232,17 @@
             </plugin>
 
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <mainClass>com.intela.realestatebackend.RealestateBackendApplication</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
 

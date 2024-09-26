@@ -4,6 +4,7 @@ import com.intela.realestatebackend.models.ProfileImage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.beans.BeanUtils;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @AllArgsConstructor
+@NoArgsConstructor
 public class ProfileImageResponse extends ProfileImage {
     private Integer userId;
 

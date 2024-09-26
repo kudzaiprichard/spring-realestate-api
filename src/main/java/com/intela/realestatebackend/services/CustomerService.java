@@ -186,7 +186,7 @@ public class CustomerService {
     }
 
     public List<IDImageResponse> getIdImagesByApplicationId(Integer applicationId, HttpServletRequest servletRequest) {
-        List<IDImageResponse> idImageResponses = idRepository.findAllByProfileId(applicationId);
+        List<ID> idImageResponses = idRepository.findAllByProfileId(applicationId);
         return idImageResponses.stream()
                 .map(Util::convertFromIDImageToImageResponse) // Assuming ImageResponse has a constructor that takes a PropertyImage
                 .collect(Collectors.toList());

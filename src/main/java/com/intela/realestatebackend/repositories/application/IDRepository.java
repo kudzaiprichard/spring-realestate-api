@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface IDRepository extends JpaRepository<ID, Integer> {
-    List<IDImageResponse> findAllByProfileId(int propertyId);
+    List<ID> findAllByProfileId(int propertyId);
 }
