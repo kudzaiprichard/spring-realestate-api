@@ -1,6 +1,7 @@
 package com.intela.realestatebackend.integration;
 
 import com.intela.realestatebackend.BaseTestContainerTest;
+import com.intela.realestatebackend.models.archetypes.Role;
 import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
 import com.intela.realestatebackend.requestResponse.LoggedUserResponse;
 import com.intela.realestatebackend.requestResponse.RetrieveAccountResponse;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,12 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthIntegrationTest extends BaseTestContainerTest {
 
     @Autowired
+    private List<TestUser> allUsers;
+
     private List<TestUser> testUserList;
 
     @Test
     @Order(1)
     void shouldRegisterUser() throws Exception {
-        TestUtil.testRegister(mockMvc, objectMapper, testUserList.get(0));
+        testUserList = TestUtil.testRegisterCustomerUsers(mockMvc, objectMapper, allUsers);
     }
 
     @Test

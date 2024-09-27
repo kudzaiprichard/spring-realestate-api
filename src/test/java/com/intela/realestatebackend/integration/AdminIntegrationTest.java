@@ -26,24 +26,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AdminIntegrationTest extends BaseTestContainerTest {
     @Autowired
-    private List<TestUser> testUserList;
+    private List<TestUser> allUsers;
 
-    private final List<TestUser> adminUsers = new ArrayList<>();
-    private final List<TestUser> customerUsers = new ArrayList<>();
+    private List<TestUser> adminUsers;
+    private List<TestUser> customerUsers;
 
     @Test
     @Order(1)
     void shouldRegisterUser() throws Exception {
-        for (TestUser user : testUserList) {
-            if (user.getROLE().equals(Role.ADMIN)) {
-                TestUtil.testRegister(mockMvc, objectMapper, user);
-                adminUsers.add(user);
-            }
-            if (user.getROLE().equals(Role.CUSTOMER)) {
-                TestUtil.testRegister(mockMvc, objectMapper, user);
-                customerUsers.add(user);
-            }
-        }
+        customerUsers = TestUtil.testRegisterCustomerUsers(mockMvc, objectMapper, allUsers);
+        adminUsers = TestUtil.testRegisterAdminUsers(mockMvc, objectMapper, allUsers);
     }
 
     @Test

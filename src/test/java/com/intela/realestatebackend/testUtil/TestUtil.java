@@ -1,6 +1,7 @@
 package com.intela.realestatebackend.testUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intela.realestatebackend.models.archetypes.Role;
 import com.intela.realestatebackend.requestResponse.AuthenticationRequest;
 import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
 import com.intela.realestatebackend.requestResponse.PasswordResetRequest;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,6 +49,28 @@ public class TestUtil {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());  // Logout should be successful
+    }
+
+    public static List<TestUser> testRegisterCustomerUsers(MockMvc mockMvc, ObjectMapper objectMapper, List<TestUser> allUsers) throws Exception {
+        List<TestUser> testUserList = new ArrayList<>();
+        for (TestUser user : allUsers) {
+            if (user.getROLE().equals(Role.CUSTOMER)) {
+                TestUtil.testRegister(mockMvc, objectMapper, user);
+                testUserList.add(user);
+            }
+        }
+        return testUserList;
+    }
+
+    public static List<TestUser> testRegisterAdminUsers(MockMvc mockMvc, ObjectMapper objectMapper, List<TestUser> allUsers) throws Exception {
+        List<TestUser> testUserList = new ArrayList<>();
+        for (TestUser user : allUsers) {
+            if (user.getROLE().equals(Role.ADMIN)) {
+                TestUtil.testRegister(mockMvc, objectMapper, user);
+                testUserList.add(user);
+            }
+        }
+        return testUserList;
     }
 
     public static void testRegister(MockMvc mockMvc, ObjectMapper objectMapper, TestUser testUser) throws Exception {
