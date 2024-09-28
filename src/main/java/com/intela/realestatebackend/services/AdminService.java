@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.intela.realestatebackend.util.Util.getUserByToken;
+
 @Service
 @RequiredArgsConstructor
 public class AdminService {
@@ -102,6 +104,29 @@ public class AdminService {
         return idImageResponses.stream()
                 .map(Util::convertFromIDImageToImageResponse) // Assuming ImageResponse has a constructor that takes a PropertyImage
                 .collect(Collectors.toList());
+    }
+
+    public RetrieveProfileResponse retrieveProfile(Integer userId) {
+        Profile profile = profileRepository.findByProfileOwnerId(userId)
+                .orElseThrow(() -> new RuntimeException("Profile not found for user"));
+        return new RetrieveProfileResponse(profile);
+    }
+
+    public RetrieveAccountResponse retrieveAccount(Integer userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return new RetrieveAccountResponse(user);
+    }
+
+    public void unbanAccount(Integer userId) {
+        // Retrieve the user by userId
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Set the bannedTill timestamp
+        user.setBannedTill(null);
+
+        // Save the updated user back to the repository
+        userRepository.save(user);
     }
     // Helper methods for mapping and updating
 

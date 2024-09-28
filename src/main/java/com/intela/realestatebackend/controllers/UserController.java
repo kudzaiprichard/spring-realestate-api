@@ -107,7 +107,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.retrieveProfile(servletRequest));
     }
 
-    @GetMapping(value = "/profiles/ids")
+    @GetMapping(value = "/profile/ids")
     public ResponseEntity<List<IDImageResponse>> getIdImagesByUserId(HttpServletRequest servletRequest) {
         return ResponseEntity.ok(this.userService.getIdImagesByUserId(servletRequest));
     }

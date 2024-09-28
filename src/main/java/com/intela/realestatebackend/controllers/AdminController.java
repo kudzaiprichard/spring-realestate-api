@@ -81,6 +81,13 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/user-management/profiles/{userId}")
+    public ResponseEntity<RetrieveProfileResponse> retrieveProfile(
+            @PathVariable Integer userId
+    ) {
+        return ResponseEntity.ok().body(adminService.retrieveProfile(userId));
+    }
+
     @GetMapping(value = "/user-management/profiles/ids/{userId}")
     public ResponseEntity<List<IDImageResponse>> getIdImagesByUserId(@PathVariable Integer userId, HttpServletRequest servletRequest) {
         return ResponseEntity.ok(this.adminService.getIdImagesByUserId(userId, servletRequest));
@@ -95,9 +102,20 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/user-management/{userId}")
+    public ResponseEntity<RetrieveAccountResponse> retrieveAccount(@PathVariable Integer userId) {
+        return ResponseEntity.ok(this.adminService.retrieveAccount(userId));
+    }
+
     @PostMapping("/user-management/ban/{userId}")
     public ResponseEntity<String> banAccount(@PathVariable Integer userId, @RequestBody Timestamp bannedTill) {
         this.adminService.banAccount(userId, bannedTill);
         return ResponseEntity.ok("User " + userId + "banned");
+    }
+
+    @PostMapping("/user-management/unban/{userId}")
+    public ResponseEntity<String> unbanAccount(@PathVariable Integer userId) {
+        this.adminService.unbanAccount(userId);
+        return ResponseEntity.ok("User " + userId + "unbanned");
     }
 }

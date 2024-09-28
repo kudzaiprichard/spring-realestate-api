@@ -1,11 +1,9 @@
 package com.intela.realestatebackend.testUtil;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intela.realestatebackend.models.archetypes.Role;
-import com.intela.realestatebackend.requestResponse.AuthenticationRequest;
-import com.intela.realestatebackend.requestResponse.AuthenticationResponse;
-import com.intela.realestatebackend.requestResponse.PasswordResetRequest;
-import com.intela.realestatebackend.requestResponse.RegisterRequest;
+import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.testUsers.TestUser;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +24,21 @@ public class TestUtil {
     public static byte[] readFileToBytes(String filePath) throws IOException {
         Path path = Paths.get(filePath);
         return Files.readAllBytes(path);
+    }
+
+    public static void resetTestUserAccountInfo(MockMvc mockMvc, ObjectMapper objectMapper, String accessToken, TestUser testUser) throws Exception {
+        UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest(
+                testUser.getFIRST_NAME(),
+                testUser.getLAST_NAME(),
+                testUser.getMOBILE_NUMBER(),
+                testUser.getEMAIL()
+        );
+        mockMvc.perform(post("/api/v1/user/")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateAccountRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     public static AuthenticationResponse testLogin(MockMvc mockMvc, ObjectMapper objectMapper, String email, String password) throws Exception {
