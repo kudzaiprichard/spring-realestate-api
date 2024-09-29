@@ -96,7 +96,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return this.getBannedTill() == null || this.getBannedTill().before(new Timestamp(System.currentTimeMillis()));
     }
 
     @Override

@@ -107,7 +107,8 @@ public class AuthService {
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("User email does not exist"));
-
+        if (!user.isAccountNonLocked())
+            throw new RuntimeException("User is banned until " + user.getBannedTill());
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(

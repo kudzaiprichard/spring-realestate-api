@@ -8,6 +8,8 @@ import com.intela.realestatebackend.repositories.UserRepository;
 import com.intela.realestatebackend.repositories.application.IDRepository;
 import com.intela.realestatebackend.requestResponse.*;
 import com.intela.realestatebackend.util.Util;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.intela.realestatebackend.util.Util.getUserByToken;
@@ -44,8 +43,12 @@ public class AdminService {
     }
 
     public void deleteAccount(Integer userId) {
-        // Delete the user account by userId
-        userRepository.deleteById(userId);
+        Optional<User> entity = userRepository.findById(userId);
+        if (entity.isPresent()) {
+            userRepository.deleteById(userId);
+        } else {
+            throw new EntityNotFoundException("Entity with id " + userId + " not found");
+        }
     }
 
     public void updateProfile(Integer userId, MultipartFile[] images, UpdateProfileRequest request) throws IllegalAccessException {

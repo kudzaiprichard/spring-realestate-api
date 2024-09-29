@@ -70,6 +70,12 @@ public class Util {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    public static User getUserByToken(String token, JwtService jwtService, UserRepository userRepository) {
+        String userEmail = jwtService.extractUsername(token);
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
     public static byte[] compressImage(byte[] image) {
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);
