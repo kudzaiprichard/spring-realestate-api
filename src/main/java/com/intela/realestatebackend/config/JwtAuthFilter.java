@@ -44,7 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userEmail;
+        final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -53,7 +53,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         jwt = authHeader.split(" ")[1].trim();
         try {
-            userEmail = jwtService.extractUsername(jwt);
+            username = jwtService.extractUsername(jwt);
         } catch (SignatureException e) {
             System.err.println("JWT validation failed: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -69,7 +69,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             boolean isTokenValid;
             try {
                 Token token = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalse(jwt).orElseThrow(() -> new AccessDeniedException("Please enter a valid ACCESS token"));
@@ -99,7 +99,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

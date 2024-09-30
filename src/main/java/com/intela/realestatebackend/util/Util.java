@@ -56,7 +56,7 @@ public class Util {
 
     public static User getUserByToken(HttpServletRequest request, JwtService jwtService, UserRepository userRepository) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String userEmail;
+        final String username;
         final String jwtToken;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -64,15 +64,15 @@ public class Util {
         }
 
         jwtToken = authHeader.split(" ")[1].trim();
-        userEmail = jwtService.extractUsername(jwtToken);
+        username = jwtService.extractUsername(jwtToken);
 
-        return userRepository.findByEmail(userEmail)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public static User getUserByToken(String token, JwtService jwtService, UserRepository userRepository) {
-        String userEmail = jwtService.extractUsername(token);
-        return userRepository.findByEmail(userEmail)
+        String username = jwtService.extractUsername(token);
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

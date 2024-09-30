@@ -178,9 +178,8 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
     }
 
     @Test
-    @Disabled
+    //@Disabled
     @Order(4)
-    //TODO: Email is being used as username at the moment, changing without additional implementations leads to errors
     public void testAdminUpdateCustomerAccount() throws Exception {
         // Step 1: Admin logs in
         AuthenticationResponse adminAuthResponse = TestUtil.testLogin(mockMvc, objectMapper, adminUsers.get(0).getEMAIL(), adminUsers.get(0).getPASSWORD());
@@ -254,6 +253,7 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
                 .andExpect(jsonPath("$[?(@.id == " + updatedAccount.getId() + ")].lastName").value("UpdatedLastName"))
                 .andExpect(jsonPath("$[?(@.id == " + updatedAccount.getId() + ")].mobileNumber").value("1234567890"))
                 .andExpect(jsonPath("$[?(@.id == " + updatedAccount.getId() + ")].email").value("updatedEmail@gmail.com"));
+        TestUtil.resetTestUserAccountInfo(mockMvc, objectMapper, customerAccessToken, customerUsers.get(0));
         TestUtil.testLogout(mockMvc, adminAccessToken);
         TestUtil.testLogout(mockMvc, customerAccessToken);
     }

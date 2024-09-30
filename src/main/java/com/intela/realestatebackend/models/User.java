@@ -18,10 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -37,6 +34,8 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private String mobileNumber;
+    @Column(unique = true)
+    private String username;
     @Column(unique = true)
     private String email;
     private String password;
@@ -86,7 +85,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.username;
     }
 
     @Override
@@ -111,8 +110,11 @@ public class User implements UserDetails {
 
     @PrePersist
     @PreUpdate
-    public void setRelationships() {
+    public void setup() {
         // Set bidirectional relationship for ContactDetails
+        if (this.username == null || this.username.isEmpty()) {
+            this.username = UUID.randomUUID().toString(); // Generate UUID before persisting
+        }
         if (this.getProfile() != null) {
             this.getProfile().setProfileOwner(this);
         }

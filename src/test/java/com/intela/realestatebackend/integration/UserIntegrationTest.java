@@ -188,9 +188,8 @@ public class UserIntegrationTest extends BaseTestContainerTest {
     }
 
     @Test
-    @Disabled
+    //@Disabled
     @Order(4)
-    //TODO: Email is being used as username at the moment, changing without additional implementations leads to errors
     void shouldUserUpdateAccountInfo() throws Exception {
         AuthenticationResponse authenticationResponse = TestUtil.testLogin(mockMvc, objectMapper, testUserList.get(0).getEMAIL(), testUserList.get(0).getPASSWORD());
         String accessToken = authenticationResponse.getAccessToken();

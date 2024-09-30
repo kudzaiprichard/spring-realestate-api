@@ -38,8 +38,8 @@ public class LogoutService implements LogoutHandler {
                 .orElse(false);
 
         if (isTokenValid) {
-            var userEmail = jwtService.extractUsername(jwt);
-            User user = userRepository.findByEmail(userEmail)
+            var username = jwtService.extractUsername(jwt);
+            User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             List<Token> userValidToken = tokenRepository.findAllValidTokenByUser(user.getId());
