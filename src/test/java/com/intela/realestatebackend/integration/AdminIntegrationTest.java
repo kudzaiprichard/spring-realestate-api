@@ -294,8 +294,8 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
         AuthenticationResponse adminAuthResponse = TestUtil.testLogin(mockMvc, objectMapper, adminUsers.get(0).getEMAIL(), adminUsers.get(0).getPASSWORD());
         String adminAccessToken = adminAuthResponse.getAccessToken();
 
-        // Step 2: Attempt to delete a non-existent user (userId 99999 does not exist)
-        Integer nonExistentUserId = 99999;
+        // Step 2: Attempt to delete a non-existent user (userId -2 does not exist)
+        Integer nonExistentUserId = -2;
 
         // Step 3: Admin tries to delete the non-existent user
         mockMvc.perform(delete("/api/v1/admin/user-management/{userId}", nonExistentUserId)
@@ -312,8 +312,8 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
         AuthenticationResponse adminAuthResponse = TestUtil.testLogin(mockMvc, objectMapper, adminUsers.get(0).getEMAIL(), adminUsers.get(0).getPASSWORD());
         String adminAccessToken = adminAuthResponse.getAccessToken();
 
-        // Step 2: Attempt to ban a non-existent user (userId 99999 does not exist)
-        Integer nonExistentUserId = 99999;
+        // Step 2: Attempt to ban a non-existent user (userId -2 does not exist)
+        Integer nonExistentUserId = -2;
 
         // Step 3: Admin tries to ban the non-existent user
         Timestamp bannedTill = Timestamp.valueOf("2025-12-31 23:59:59");
@@ -373,8 +373,8 @@ public class AdminIntegrationTest extends BaseTestContainerTest {
         AuthenticationResponse adminAuthResponse = TestUtil.testLogin(mockMvc, objectMapper, adminUsers.get(0).getEMAIL(), adminUsers.get(0).getPASSWORD());
         String adminAccessToken = adminAuthResponse.getAccessToken();
 
-        // Step 2: Attempt to unban a non-existent user (userId 99999 does not exist)
-        Integer nonExistentUserId = 99999;
+        // Step 2: Attempt to unban a non-existent user (userId -2 does not exist)
+        Integer nonExistentUserId = -2;
 
         // Step 3: Admin tries to unban the non-existent user
         mockMvc.perform(post("/api/v1/admin/user-management/unban/{userId}", nonExistentUserId)
