@@ -5,14 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImageResponse {
-    private int id;
-    private byte[] image;
-    private String type;
-    private String name;
-    private Integer propertyId;
+public class UpdateProfileResponse {
+    Map<String, Object> updatedFields;
 }

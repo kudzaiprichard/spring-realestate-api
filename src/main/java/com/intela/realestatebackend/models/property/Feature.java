@@ -1,5 +1,6 @@
-package com.intela.realestatebackend.models;
+package com.intela.realestatebackend.models.property;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,9 +18,10 @@ public class Feature {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(hidden = true)
     private Integer id;
-    private int bathrooms;
-    private int bedrooms;
-    private int lounges;
-    private int storeys;
+    private Integer bathrooms;
+    private Integer bedrooms;
+    private Integer lounges;
+    private Integer parking;
 }

@@ -1,0 +1,28 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+    <id>src-assembly</id>
+    <formats>
+        <format>jar</format> <!-- You can use jar if needed, here we use zip -->
+    </formats>
+
+    <fileSets>
+        <!-- Include all project sources (main + test) -->
+        <fileSet>
+            <directory>${basedir}/src</directory>
+            <outputDirectory>/src</outputDirectory> <!-- Keep the structure as /src in the archive -->
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <!-- Include the pom.xml -->
+        <fileSet>
+            <directory>${basedir}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

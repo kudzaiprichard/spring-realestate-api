@@ -1,4 +1,4 @@
-package com.intela.realestatebackend.models;
+package com.intela.realestatebackend.models.archetypes;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.intela.realestatebackend.models.Permission.*;
+import static com.intela.realestatebackend.models.archetypes.Permission.*;
 
 @RequiredArgsConstructor
 public enum Role {
@@ -26,7 +26,7 @@ public enum Role {
                     CUSTOMER_UPDATE,
                     CUSTOMER_DELETE,
                     CUSTOMER_READ
-                    )
+            )
     ),
     DEALER(
             Set.of(

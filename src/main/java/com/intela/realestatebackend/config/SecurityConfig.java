@@ -1,5 +1,6 @@
 package com.intela.realestatebackend.config;
 
+import com.intela.realestatebackend.handler.CustomLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +12,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static com.intela.realestatebackend.models.Permission.*;
-import static com.intela.realestatebackend.models.Role.*;
-import static org.springframework.http.HttpMethod.*;
-import static org.springframework.http.HttpMethod.DELETE;
+import java.util.List;
+
+import static com.intela.realestatebackend.models.archetypes.Role.*;
 
 @Configuration
 @EnableWebSecurity
@@ -24,40 +26,40 @@ import static org.springframework.http.HttpMethod.DELETE;
 public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-    private final LogoutHandler logoutHandler;
+    private final CustomLogoutHandler logoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((authorize)->authorize
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/v1/auth/**")
+                        .permitAll()
+                        // Restrict these auth-related endpoints to authenticated users
+                        .requestMatchers("/api/v1/auth/user",
+                                "/api/v1/auth/resetPassword")
+                        .authenticated()
+                        // Allow access to Swagger UI and API docs
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**")
                         .permitAll()
                         //ADMIN ENDPOINTS
                         .requestMatchers("/api/v1/admin/**").hasRole(ADMIN.name())
-                        .requestMatchers(GET,"/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
-                        .requestMatchers(POST,"/api/v1/admin/**").hasAuthority(ADMIN_CREATE.name())
-                        .requestMatchers(PUT,"/api/v1/admin/**").hasAuthority(ADMIN_UPDATE.name())
-                        .requestMatchers(DELETE,"/api/v1/admin/**").hasAuthority(ADMIN_DELETE.name())
 
                         //CUSTOMER ENDPOINTS
-                        .requestMatchers("/api/v1/customer/**").hasAnyRole(CUSTOMER.name(),ADMIN.name())
-                        .requestMatchers(GET,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_READ.name(), ADMIN_READ.name())
-                        .requestMatchers(POST,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_CREATE.name(), ADMIN_CREATE.name())
-                        .requestMatchers(PUT,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_UPDATE.name(), ADMIN_UPDATE.name())
-                        .requestMatchers(DELETE,"/api/v1/customer/**").hasAnyAuthority(CUSTOMER_DELETE.name(), ADMIN_DELETE.name())
+                        .requestMatchers("/api/v1/customer/**").hasAnyRole(CUSTOMER.name(), ADMIN.name())
+
+                        .requestMatchers("/api/v1/properties/**").permitAll()
+
+                        .requestMatchers("/api/v1/user/**").hasAnyRole(CUSTOMER.name(), ADMIN.name())
 
                         //DEALER ENDPOINTS
-                        .requestMatchers("/api/v1/dealer/**").hasAnyRole(DEALER.name(),ADMIN.name())
-                        .requestMatchers(GET,"/api/v1/dealer/**").hasAnyAuthority(DEALER_READ.name(), ADMIN_READ.name())
-                        .requestMatchers(POST,"/api/v1/dealer/**").hasAnyAuthority(DEALER_CREATE.name(), ADMIN_CREATE.name())
-                        .requestMatchers(PUT,"/api/v1/dealer/**").hasAnyAuthority(DEALER_UPDATE.name(), ADMIN_UPDATE.name())
-                        .requestMatchers(DELETE,"/api/v1/dealer/**").hasAnyAuthority(DEALER_DELETE.name(), ADMIN_DELETE.name())
+                        .requestMatchers("/api/v1/dealer/**").hasAnyRole(DEALER.name(), ADMIN.name())
 
                         .anyRequest()
                         .authenticated()
                 )
-                .sessionManagement((session)->session
+                .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
@@ -67,9 +69,20 @@ public class SecurityConfig {
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler((
                                 (request, response, authentication) ->
-                                SecurityContextHolder.clearContext()
+                                        SecurityContextHolder.clearContext()
                         ))
                 );
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
